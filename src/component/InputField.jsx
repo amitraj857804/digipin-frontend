@@ -15,7 +15,7 @@ function InputField({
   inputmode = null,
   readOnly,
   showError = true,
-  mobileShowError = true,
+  mobileShowError = false,
   centerMobileError = false, 
   ...props
 }) {
@@ -34,7 +34,7 @@ function InputField({
       value: 6,
       message: "*Minimum length 6 required",
     };
-  } else if (id === "phone") {
+  } else if (id === "phoneNumber") {
     validationRules.pattern = {
       value: /^[0-9]{10}$/,
       message: "*Mobile number should be 10 digits",
@@ -57,8 +57,8 @@ function InputField({
         maxLength={id === "phone" ? max : undefined}
         className={`${
           className ? className : ""
-        } px-2 py-2 border  outline-none bg-white/90 text-black rounded-full placeholder:text-sm ${
-          errors[id]?.message ? "border-red-500" : "border-slate-600"
+        } px-2 py-2 border  outline-none bg-white/90 text-black rounded-xl placeholder:text-sm ${
+          errors[id]?.message ? "border-red-500" : "border-blue-800"
         }`}
         {...register(id, validationRules)}
         readOnly={readOnly}
