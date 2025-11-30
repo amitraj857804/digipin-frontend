@@ -11,6 +11,7 @@ function InputField({
   className,
   min,
   max,
+  length,
   placeholder,
   inputmode = null,
   readOnly,
@@ -38,6 +39,29 @@ function InputField({
       value: /^[0-9]{10}$/,
       message: "*Mobile number should be 10 digits",
     };
+  } else if (id === "userName") {
+    validationRules.pattern = {
+      value: /^[a-zA-Z0-9_]+$/,
+      message: "*Spaces are not allowed",
+    };
+    validationRules.minLength = {
+      value: 3,
+      message: "*Username must be at least 3 characters long",
+    };
+  } else if (id === "uniPin") {
+    validationRules.pattern = {
+      value: /^[0-9]{6}$/,
+      message: "*DaPin must be exactly 6 digits",
+    };
+    validationRules.validate = (value) => {
+      if (!/^[0-9]*$/.test(value)) {
+        return "*Only numbers are allowed";
+      }
+      if (value.length !== 6) {
+        return "*DaPin must be exactly 6 digits";
+      }
+      return true;
+    };
   }
 
   return (
@@ -50,7 +74,7 @@ function InputField({
         type={type}
         id={id}
         placeholder={placeholder}
-        maxLength={id === "phone" ? max : undefined}
+        maxLength={id === "phone" ? max : length}
         className={`rounded-xl ${
           className ? className : ""
         } px-2 py-2 border  outline-none bg-white/90 text-black  placeholder:text-sm ${

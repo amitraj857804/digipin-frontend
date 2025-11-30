@@ -10,7 +10,7 @@ function RootRoute({ onOpenLoginModal, onOpenSignupModal }) {
   // If user is authenticated, show Home page
   // If not, show Landing page
   if (token) {
-    return <Home onOpenLoginModal={onOpenLoginModal} onOpenSignupModal={onOpenSignupModal} />
+    return <Home  onOpenLoginModal={onOpenLoginModal} onOpenSignupModal={onOpenSignupModal} />
   }
   
   return <Landing onOpenLoginModal={onOpenLoginModal} onOpenSignupModal={onOpenSignupModal} />

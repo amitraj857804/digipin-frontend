@@ -40,8 +40,9 @@ const SignUp = ({
       }
       toast.success("SignedUp Successfully!");
     } catch (error) {
+      console.log(error);
       toast.error(
-        error.response?.data?.message ||
+        error.response?.data ||
           error.response?.data.error ||
           "Signup failed. Please try again."
       );
@@ -100,7 +101,7 @@ const SignUp = ({
                     id="userName"
                     type="text"
                     message="*Name required"
-                    placeholder="Full Name"
+                    placeholder="UserName e.g. john_doe, user123 "
                     register={register}
                     errors={errors}
                     required={true}

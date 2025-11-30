@@ -62,7 +62,10 @@ export const createDigitalAddress = async (addressData, api, toast, token) => {
       longitude: geolocation.longitude,
       latitude: geolocation.latitude,
       address: addressData.address || "",
-      upiPin: addressData.upiPin || "",
+      addressName: addressData.addressName || "",
+      pincode: addressData.pincode || "",
+      purpose: addressData.purpose || "",
+      uniPin: addressData.uniPin || "",
       consentType: addressData.consentType || "PERMANENT",
       consentDurationDays: addressData.consentDurationDays || 365,
     };

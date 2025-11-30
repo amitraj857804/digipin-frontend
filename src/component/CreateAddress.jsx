@@ -3,7 +3,11 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import InputField from "./InputField";
 import { useSelector } from "react-redux";
-import { selectUsername, selectUserVerified, selectToken } from "../store/authSlice";
+import {
+  selectUsername,
+  selectUserVerified,
+  selectToken,
+} from "../store/authSlice";
 import AadhaarVerificationDialog from "./AadhaarVerificationDialog";
 import { Plus, Loader } from "lucide-react";
 import api from "../api/api";
@@ -11,6 +15,9 @@ import { createDigitalAddress } from "../utils/geolocation";
 
 function CreateAddress() {
   const [selectedSuffix, setSelectedSuffix] = useState("home.add");
+  const [selectedPurpose, setSelectedPurpose] = useState(
+    "Personal - Home Address"
+  );
   const [showCustomSuffix, setShowCustomSuffix] = useState(false);
   const [customSuffix, setCustomSuffix] = useState("");
   const [showVerificationDialog, setShowVerificationDialog] = useState(false);
@@ -29,6 +36,7 @@ function CreateAddress() {
     defaultValues: {
       addressName: "",
       address: "",
+      pincode: "",
       upiPin: "",
       consentType: "PERMANENT",
       consentDurationDays: 365,
@@ -61,27 +69,30 @@ function CreateAddress() {
 
   const addHandler = async (data) => {
     if (!data) return; // Guard against no data
-    
+
     setIsCreating(true);
     try {
       // Prepare address data with suffix
       const addressData = {
         suffix: selectedSuffix,
         address: data.address,
-        upiPin: data.upiPin,
+        addressName: data.addressName,
+        pincode: data.pincode,
+        purpose: data.purpose,
+        uniPin: data.uniPin,
         consentType: data.consentType,
         consentDurationDays: parseInt(data.consentDurationDays),
       };
 
       // Create digital address with geolocation
       const result = await createDigitalAddress(addressData, api, toast, token);
-      
+
       // Reset form on success
       reset();
       setSelectedSuffix("home.add");
       setCustomSuffix("");
       setShowCustomSuffix(false);
-      
+
       // Show success message with created address
       if (result?.address) {
         toast.success(`Digital address created: ${result.address}`);
@@ -113,11 +124,22 @@ function CreateAddress() {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Purpose
                   </label>
-                  <select className="w-full  py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all">
-                    <option>Personal - Home Address</option>
-                    <option>Business - Office Address</option>
-                    <option>Temporary - Temporary Address</option>
-                    <option>Other - Specify Purpose</option>
+                  <select
+                    {...register("purpose")}
+                    className="w-full  py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                  >
+                    <option value="Personal - Home Address">
+                      Personal - Home Address
+                    </option>
+                    <option value="Business - Office Address">
+                      Business - Office Address
+                    </option>
+                    <option value="Temporary - Temporary Address">
+                      Temporary - Temporary Address
+                    </option>
+                    <option value="Other - Specify Purpose">
+                      Other - Specify Purpose
+                    </option>
                   </select>
                 </div>
                 <div className="w-1/2">
@@ -126,7 +148,7 @@ function CreateAddress() {
                   </label>
                   <InputField
                     required={true}
-                    id="AddName"
+                    id="addressName"
                     type="text"
                     message="*Address name is required"
                     placeholder="e.g. My Home, Work Office"
@@ -142,10 +164,10 @@ function CreateAddress() {
                     Address
                   </label>
                   <InputField
-                    required = {true}
-                    id="location"
+                    required={true}
+                    id="address"
                     type="text"
-                    message="*Email or Mobile Number is required"
+                    message="*physical address required"
                     placeholder="Enter your physical address"
                     register={register}
                     errors={errors}
@@ -160,7 +182,7 @@ function CreateAddress() {
                     required
                     id="pincode"
                     type="number"
-                    message="*Email or Mobile Number is required"
+                    message="*Pincode required"
                     placeholder="Enter pincode"
                     register={register}
                     errors={errors}
@@ -206,7 +228,9 @@ function CreateAddress() {
                     ⓘ Temporary Consent
                   </p>
                   <p className="text-xs text-amber-800 mt-2">
-                    Your digital address will be accessible only for the specified number of days. After expiration, partners will need your permission again to access your address.
+                    Your digital address will be accessible only for the
+                    specified number of days. After expiration, partners will
+                    need your permission again to access your address.
                   </p>
                 </div>
               )}
@@ -217,15 +241,20 @@ function CreateAddress() {
                 </label>
                 <InputField
                   required
-                  id="upiPin"
-                  type="number"
-                  message="*DaPin is required"
-                  placeholder="Enter a unique 4-6 digit pin"
+                  id="uniPin"
+                  type="text"
+                  inputmode="numeric"
+                  message="*DaPin must be exactly 6 digits"
+                  placeholder="Enter a 6 digit pin (e.g., 123456)"
                   register={register}
                   errors={errors}
+                  length={6}
                   className="mb-2 w-full px-4 py-2 border !border-blue-200 rounded-lg transition-all"
+                  onInput={(e) => {
+                    // Remove any non-numeric characters
+                    e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                  }}
                 />
-                
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -322,43 +351,49 @@ function CreateAddress() {
             </div>
           </form>
           <div className="gap-8 flex flex-col">
-          
-          {/* Preview Section */}
-          <div className="flex flex-col justify-center">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
-              <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
-                Preview
-              </p>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs text-gray-500">Purpose</p>
-                  <p className="text-lg font-bold text-gray-900">
-                    Personal - Home Address
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Address Name</p>
-                  <p className="text-lg font-bold text-gray-900">My Home</p>
-                </div>
-                <div className="pt-4 border-t border-blue-200">
-                  <p className="text-xs text-gray-500 mb-2">
-                    Your Generated ID
-                  </p>
-                  <p className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text font-mono">
-                    DIP-XXXXXXXXXX
-                  </p>
+            {/* Preview Section */}
+            <div className="flex flex-col justify-center">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
+                  Preview
+                </p>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500">Purpose</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      Personal - Home Address
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Address Name</p>
+                    <p className="text-lg font-bold text-gray-900">My Home</p>
+                  </div>
+                  <div className="pt-4 border-t border-blue-200">
+                    <p className="text-xs text-gray-500 mb-2">
+                      Your Generated ID
+                    </p>
+                    <p className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text font-mono">
+                      DIP-XXXXXXXXXX
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="mt-2 p-3 bg-blue-50 border border-2 border-blue-200 rounded-lg">
-                  <p className="text-xs font-semibold text-blue-900 mb-1">
-                    🔐 What is DaPin?
-                  </p>
-                  <p className="text-xs text-blue-800 leading-relaxed">
-                    DaPin is your <span className="font-semibold">Digital Address PIN</span> - a security layer that acts as a <span className="font-semibold">consent granter</span>. When you share your digital address with partners or service providers, they will need this PIN to access your information. This ensures only authorized parties can use your digital address and gives you complete control over who accesses your data.
-                  </p>
-                </div>
+            <div className="mt-2 p-3 bg-blue-50 border border-2 border-blue-200 rounded-lg">
+              <p className="text-xs font-semibold text-blue-900 mb-1">
+                🔐 What is DaPin?
+              </p>
+              <p className="text-xs text-blue-800 leading-relaxed">
+                DaPin is your{" "}
+                <span className="font-semibold">Digital Address PIN</span> - a
+                security layer that acts as a{" "}
+                <span className="font-semibold">consent granter</span>. When you
+                share your digital address with partners or service providers,
+                they will need this PIN to access your information. This ensures
+                only authorized parties can use your digital address and gives
+                you complete control over who accesses your data.
+              </p>
+            </div>
           </div>
         </div>
       </div>
