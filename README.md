@@ -260,36 +260,111 @@ npm run dev
 8. Subsequent address creations skip verification
 9. Error → User can retry after 3 seconds
 
-## 🔄 Authentication Flow
+## 🔄 Authentication & Verification Flow
 
-1. User submits login/signup form in modal
-2. Modal validates form data
-3. API call made to backend
-4. Token received and stored in Redux
-5. AuthModal closes automatically
-6. User redirected to dashboard
-7. Navbar updates to show user avatar
-8. Protected routes become accessible
+### Login/Signup Process
+1. User clicks "Sign In" or "Sign Up" on landing page
+2. Modal appears with tab selection
+3. User enters credentials/registration info
+4. Form validation with react-hook-form
+5. API call made to backend
+6. Token received and stored in:
+   - Redux state (auth.token)
+   - localStorage (JWT-TOKEN)
+7. AuthModal closes automatically
+8. User redirected to dashboard
+9. Navbar updates to show user avatar
+10. Protected routes become accessible
+
+### Aadhaar Verification Process
+1. User clicks "Create Digital Address"
+2. If `userVerified` is false/null in Redux:
+   - Aadhaar verification dialog opens
+   - User enters Aadhaar number and DOB
+   - System validates format (12 digits, valid date)
+   - API call to `/api/auth/verify-aadhaar`
+   - On success:
+     - Redux state updated: `userVerified = true`
+     - Dialog closes after 2 seconds
+     - Form data from button click is preserved
+     - Address creation proceeds automatically
+3. If `userVerified` is true:
+   - Dialog skipped entirely
+   - Address creation form shows immediately
+   - User can create unlimited addresses without re-verification
+
+### Token Authorization
+- All requests to `/api/digital-address/create` include Authorization header
+- Format: `Authorization: Bearer ${token}`
+- Token passed from Redux state to utility function
+- Geolocation coordinates fetched and attached to request
+- Response includes created address details
 
 ## 🛡️ Security Features
 
-- ✅ Token-based authentication
-- ✅ Secure API endpoints
-- ✅ Input validation on forms
-- ✅ Protected routes
-- ✅ Session management
-- ✅ Encrypted data transmission
+- ✅ **Token-based JWT authentication** - Secure token storage and transmission
+- ✅ **Aadhaar Verification** - Identity confirmation for address creation
+- ✅ **DaPin Security** - 4-6 digit PIN as consent granter for address access
+- ✅ **Geolocation Integration** - Accurate coordinates for digital addresses
+- ✅ **Input Validation** - React Hook Form with comprehensive validation
+- ✅ **Protected Routes** - Automatic redirection for unauthorized access
+- ✅ **Session Management** - Token persistence across browser sessions
+- ✅ **Encrypted API Transmission** - HTTPS for all API calls
+- ✅ **Temporary Consent** - Time-limited address access with expiration
+- ✅ **Bearer Token Authorization** - All protected endpoints require valid token
+
+## 🆕 Latest Updates (Current Version)
+
+### Aadhaar Verification System
+- Added Aadhaar verification dialog with glassmorphic design
+- Date of birth validation with ISO format conversion
+- Verification status caching in Redux (no re-verification needed)
+- User-friendly error handling and retry mechanism
+- Automatic dialog closure on successful verification
+
+### Digital Address Creation
+- Comprehensive form with geolocation integration
+- Multiple address suffix options (home.add, work.add, office.add, personal.add, custom)
+- DaPin security implementation with 4-6 digit PIN requirement
+- Permanent and temporary consent options
+- Configurable consent duration in days
+
+### Enhanced Security
+- Bearer token authentication for all address creation requests
+- Geolocation coordinates validation (6 decimal precision)
+- DaPin acts as consent granter for address access
+- Temporary address expiration after specified duration
+- Form data persistence through verification process
+
+### Redux State Management
+- `userVerified` state for Aadhaar verification status
+- Redux dispatch in AadhaarVerificationDialog for state updates
+- Persistent verification across component re-renders
+- Token-based authorization throughout app
+
+### Geolocation Integration
+- Browser Geolocation API for precise coordinates
+- High accuracy mode enabled (enableHighAccuracy: true)
+- 10-second timeout for location requests
+- Error handling for permission denied/unavailable cases
+- Latitude/Longitude with 6 decimal precision
 
 ## 📈 Future Enhancements
 
-- [ ] Real-time notifications
-- [ ] Advanced analytics dashboard
-- [ ] QR code generation for addresses
-- [ ] Integration with delivery services
-- [ ] Mobile app (iOS/Android)
-- [ ] Dark mode theme
-- [ ] Multi-language support
-- [ ] Two-factor authentication
+- [ ] Real-time notifications system
+- [ ] Advanced analytics dashboard with address usage stats
+- [ ] QR code generation for digital addresses
+- [ ] Integration with delivery services (Flipkart, Amazon, Dunzo)
+- [ ] Mobile app (iOS/Android with React Native)
+- [ ] Dark mode theme support
+- [ ] Multi-language support (Hindi, Bengali, etc.)
+- [ ] Two-factor authentication (SMS/Email OTP)
+- [ ] Address bulk operations (create multiple addresses)
+- [ ] API rate limiting and usage statistics
+- [ ] SMS notifications for deliveries
+- [ ] Email notifications for access logs
+- [ ] Advanced consent management UI
+- [ ] Digital address renewal/expiration management
 
 ## 🤝 Contributing
 
