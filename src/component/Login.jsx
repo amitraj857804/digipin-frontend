@@ -7,7 +7,6 @@ import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import api from "../api/api";
 import { useSelector, useDispatch } from "react-redux";
 import { setToken, selectToken } from "../store/authSlice";
-import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function Login({ onSwitchTab, onClose, isModal = false }) {
@@ -101,7 +100,7 @@ function Login({ onSwitchTab, onClose, isModal = false }) {
 
                 <div className="w-full relative">
                   <InputField
-                    required
+                    requireda
                     id="emailOrPhone"
                     type="text"
                     message="*Email or Mobile Number is required"

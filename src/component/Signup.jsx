@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import InputField from "./InputField";
 import api from "../api/api";
 import "../App.css";
-import { useNavigate } from "react-router-dom";
 import { FaUser, FaEye, FaEyeSlash, FaPhoneSquareAlt } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
@@ -11,12 +10,10 @@ import toast from "react-hot-toast";
 
 const SignUp = ({
   onSwitchTab,
-
   isModal = false,
 }) => {
   const [loader, setLoader] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
 
   const {
     register,
@@ -26,7 +23,7 @@ const SignUp = ({
   } = useForm({
     defaultValues: {
       userName: "",
-      email: "",
+      emailId: "",
       password: "",
       phoneNumber: "",
     },
@@ -43,7 +40,6 @@ const SignUp = ({
       }
       toast.success("SignedUp Successfully!");
     } catch (error) {
-      console.log(error);
       toast.error(
         error.response?.data?.message ||
           error.response?.data.error ||
@@ -85,9 +81,7 @@ const SignUp = ({
             >
               Login
             </h1>
-            <h1
-              className="text-center px-4 py-2 btn2color font-bold lg:text-2xl text-xl cursor-pointer relative  rounded-lg shadow-md hover:shadow-lg transition-shadow"
-            >
+            <h1 className="text-center px-4 py-2 btn2color font-bold lg:text-2xl text-xl cursor-pointer relative  rounded-lg shadow-md hover:shadow-lg transition-shadow">
               SignUp
             </h1>
           </div>
@@ -127,7 +121,7 @@ const SignUp = ({
 
                 <div className="relative w-full">
                   <InputField
-                    id="email"
+                    id="emailId"
                     type="email"
                     message="*Email required"
                     placeholder="E-mail"

@@ -16,12 +16,11 @@ function InputField({
   readOnly,
   showError = true,
   mobileShowError = false,
-  centerMobileError = false, 
+  centerMobileError = false,
   ...props
 }) {
   const validationRules = {
     required: { value: required, message },
-    
   };
 
   if (type === "email") {
@@ -42,22 +41,19 @@ function InputField({
   }
 
   return (
-    <div className={`flex flex-col gap-1 relative ${errors[id]?.message && mobileShowError ? 'sm:mb-0 mb-6' : ''}`}>
-      <label
-        htmlFor={id}
-        className={`${className ? className : ""} font-semibold text-md`}
-      >
-        {label}
-      </label>
-
+    <div
+      className={`flex flex-col gap-1 relative ${
+        errors[id]?.message && mobileShowError ? "sm:mb-0 mb-6" : ""
+      }`}
+    >
       <input
         type={type}
         id={id}
         placeholder={placeholder}
         maxLength={id === "phone" ? max : undefined}
-        className={`${
+        className={`rounded-xl ${
           className ? className : ""
-        } px-2 py-2 border  outline-none bg-white/90 text-black rounded-xl placeholder:text-sm ${
+        } px-2 py-2 border  outline-none bg-white/90 text-black  placeholder:text-sm ${
           errors[id]?.message ? "border-red-500" : "border-blue-800"
         }`}
         {...register(id, validationRules)}
@@ -65,11 +61,13 @@ function InputField({
         inputMode={inputmode}
         {...props}
       />
-      
+
       {/* Show error on mobile only */}
       {errors[id]?.message && mobileShowError && (
-        <p className={`sm:hidden absolute -bottom-8 left-0 right-0 text-xs font-semibold text-red-600 px-2 py-1 pb-3 rounded z-10
-        ${centerMobileError ? "text-center" : "" } `}>
+        <p
+          className={`sm:hidden absolute -bottom-8 left-0 right-0 text-xs font-semibold text-red-600 px-2 py-1 pb-3 rounded z-10
+        ${centerMobileError ? "text-center" : ""} `}
+        >
           {errors[id]?.message}*
         </p>
       )}

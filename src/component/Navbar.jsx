@@ -7,8 +7,10 @@ import toast from "react-hot-toast";
 import {
   selectUsername,
   selectToken,
+  selectUserLoading,
   clearToken,
   clearUserName,
+  fetchUserDetails,
 } from "../store/authSlice";
 
 function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
@@ -20,14 +22,36 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
   const dispatch = useDispatch();
   const username = useSelector(selectUsername);
   const token = useSelector(selectToken);
+  const userLoading = useSelector(selectUserLoading);
+
+  useEffect(() => {
+    if (token && !username) {
+      dispatch(fetchUserDetails())
+      
+        .catch((error) => {
+          // Only clear token for authentication errors (401)
+          if (error.includes && error.includes("Authentication expired")) {
+            dispatch(clearToken());
+            toast.error("Session expired. Please login again.");
+          } else {
+            // Log other errors but don't log out the user
+            console.error("Failed to fetch username:", error);
+          }
+        });
+    }
+  }, [token, username, dispatch]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Close if clicking outside BOTH desktop AND mobile refs
-      const isOutsideDesktop = desktopDropdownRef.current && !desktopDropdownRef.current.contains(event.target);
-      const isOutsideMobile = mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target);
-      
+      const isOutsideDesktop =
+        desktopDropdownRef.current &&
+        !desktopDropdownRef.current.contains(event.target);
+      const isOutsideMobile =
+        mobileDropdownRef.current &&
+        !mobileDropdownRef.current.contains(event.target);
+
       // Only close if it's outside the active dropdown
       if (isOutsideDesktop && isOutsideMobile) {
         setShowLogoutDropdown(false);
@@ -93,7 +117,10 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
     <div className="fixed top-0 left-0 z-[9979] w-full bg-gradient-to-r from-white via-blue-50 to-indigo-50 border-b border-blue-200 shadow-sm">
       <div className="flex items-center justify-between px-4 md:px-8 lg:px-12 py-4">
         {/* Logo Section */}
-        <Link to={`${token? "home" : "/"}`} className="flex items-center gap-2 cursor-pointer group">
+        <Link
+          to={`${token ? "home" : "/"}`}
+          className="flex items-center gap-2 cursor-pointer group"
+        >
           <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg shadow-lg group-hover:shadow-xl transition-shadow">
             <MapPin className="w-6 h-6 text-white" />
           </div>
@@ -106,8 +133,6 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
             </span>
           </div>
         </Link>
-
-      
 
         {/* Navigation Links */}
         <div
@@ -210,14 +235,16 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
                 Sign Up
               </button>
             </>
+          ) : userLoading ? (
+            <span className="text-sm animate-pulse">Loading user...</span>
           ) : (
-            <div className="relative" ref={desktopDropdownRef}>
+            <div className="relative " ref={desktopDropdownRef}>
               <button
                 onClick={() => setShowLogoutDropdown(!showLogoutDropdown)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-all font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg cursor-pointer hover:bg-blue-200 transition-all font-medium"
               >
-                <span className="w-8 h-8 btn1color cursor-pointer rounded-full flex items-center justify-center text-sm font-bold">
-                  {username?.charAt(0)?.toUpperCase() || "U"}
+                <span className="w-8 h-8 btn1color  rounded-full flex items-center justify-center text-sm font-bold">
+                  {username?.charAt(0)?.toUpperCase() || ""}
                 </span>
                 {username}
               </button>
@@ -234,7 +261,6 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
               )}
             </div>
           )}
-          
         </div>
 
         {/* Mobile Auth Buttons */}
@@ -275,8 +301,8 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
               )}
             </div>
           )}
-            {/* Menu Button for Mobile */}
-            </div>
+          {/* Menu Button for Mobile */}
+        </div>
         <MenuIcon
           className="lg:hidden w-8 h-8  cursor-pointer text-gray-700 hover:text-blue-600 transition-colors"
           onClick={(e) => {
