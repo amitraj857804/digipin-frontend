@@ -23,6 +23,7 @@ import {
   Loader,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import AadhaarVerificationDialog from "../component/address/AadhaarVerificationDialog";
 
 function UserProfile() {
   const dispatch = useDispatch();
@@ -33,14 +34,15 @@ function UserProfile() {
   const userError = useSelector(selectUserError);
   const userPhoneNumber = useSelector(selectUserPhone);
   const userVerified = useSelector(selectUserVerified);
-console.log(userVerified);
+  
   // Local state for editable fields
   const [isEditing, setIsEditing] = useState(false);
+  const [showAadhaarDialog, setShowAadhaarDialog] = useState(false);
   const [profileData, setProfileData] = useState({
     username: username || "User",
     email: userEmail || "email@example.com",
     joinDate: new Date().toLocaleDateString(),
-    bio: "Digital address enthusiast",
+
     addresses: 3,
   });
 
@@ -71,7 +73,6 @@ console.log(userVerified);
       }));
     }
   }, [username, userEmail, userId, userPhoneNumber]);
-  console.log(profileData);
 
   const handleEditChange = (field, value) => {
     setEditForm({ ...editForm, [field]: value });
@@ -126,12 +127,9 @@ console.log(userVerified);
           <div className="flex flex-col md:flex-row items-center gap-8">
             {/* Avatar Section */}
             <div className="relative">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+              <div className="w-32 h-32 btn1color rounded-full flex items-center justify-center shadow-lg">
                 <User className="w-16 h-16 text-white" />
               </div>
-              <button className="absolute bottom-0 right-0 bg-white border-2 border-blue-600 rounded-full p-3 shadow-lg hover:bg-blue-50 transition-colors">
-                <Camera className="w-5 h-5 text-blue-600" />
-              </button>
             </div>
 
             {/* Profile Info */}
@@ -139,11 +137,17 @@ console.log(userVerified);
               <h2 className="text-3xl font-bold text-gray-900">
                 {profileData.username}
               </h2>
-              <p className="text-gray-600 mt-1">{profileData.bio}</p>
+              <p className="text-gray-600 mt-1">{profileData.email}</p>
               <div className="flex gap-3 mt-4 justify-center md:justify-start flex-wrap">
-                <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold flex items-center gap-2">
-                  <Shield className="w-4 h-4" /> Verified Account
-                </span>
+                {userVerified ? (
+                  <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold flex items-center gap-2">
+                    <Shield className="w-4 h-4" /> Verified Account
+                  </span>
+                ) : (
+                  <span className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold flex items-center gap-2">
+                    <Shield className="w-4 h-4" /> Verification Pending
+                  </span>
+                )}
                 <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
                   {profileData.addresses} Digital Addresses
                 </span>
@@ -154,7 +158,7 @@ console.log(userVerified);
             {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:shadow-lg transition-shadow"
+                className="flex items-center gap-2 px-6 py-3 btn1color cursor-pointer font-bold rounded-lg hover:shadow-lg transition-shadow"
               >
                 <Edit className="w-5 h-5" /> Edit Profile
               </button>
@@ -193,7 +197,7 @@ console.log(userVerified);
                       onClick={() =>
                         handleCopy(profileData.username, "Username")
                       }
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      className="p-2 hover:bg-gray-200 rounded transition-colors cursor-pointer"
                     >
                       <Copy className="w-4 h-4 text-gray-600" />
                     </button>
@@ -220,7 +224,7 @@ console.log(userVerified);
                     </p>
                     <button
                       onClick={() => handleCopy(profileData.email, "Email")}
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      className="p-2 hover:bg-gray-200 rounded transition-colors cursor-pointer"
                     >
                       <Copy className="w-4 h-4 text-gray-600" />
                     </button>
@@ -249,52 +253,83 @@ console.log(userVerified);
                       onClick={() =>
                         handleCopy(profileData.userPhoneNumber, "Phone")
                       }
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      className="p-2 hover:bg-gray-200 rounded transition-colors cursor-pointer"
                     >
                       <Copy className="w-4 h-4 text-gray-600" />
                     </button>
                   </div>
                 )}
               </div>
-
-              
             </div>
           </div>
+           {/* Aadhaar Verification Card */}
+        <div className=" bg-white rounded-2xl shadow-lg border border-blue-100 p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                Aadhaar Verification
+              </h3>
+              <p className="text-gray-600 mt-1">
+                Verify your identity using your Aadhaar number for enhanced security
+              </p>
+            </div>
+            {userVerified ? (
+              <div className="px-6 py-3 bg-green-100 text-green-800 rounded-lg font-semibold flex items-center gap-2">
+                <Shield className="w-5 h-5" /> Verified
+              </div>
+            ) : (
+              <div className="px-3 py-3 bg-yellow-100 text-yellow-800 rounded-full font-semibold flex items-center gap-2">
+                <Shield className="w-5 h-5" /> Pending
+              </div>
+            )}
+          </div>
 
-        
+          {userVerified ? (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+              <p className="text-green-700 font-semibold mb-4">
+                ✓ Your Aadhaar has been successfully verified
+              </p>
+              <p className="text-gray-600 text-sm">
+                Your account has verified access to all premium features and enhanced security benefits.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                <p className="text-blue-700 font-semibold mb-2">
+                  Why verify your Aadhaar?
+                </p>
+                <ul className="text-gray-600 text-sm space-y-2 ml-4">
+                  <li>✓ Enhanced account security</li>
+                  <li>✓ Access to premium features</li>
+                  <li>✓ Verified badge on your profile</li>
+                  <li>✓ Priority support</li>
+                </ul>
+              </div>
+
+              <button
+                onClick={() => setShowAadhaarDialog(true)}
+                className="w-full px-6 py-3 btn1color cursor-pointer font-bold rounded-lg hover:shadow-lg transition-shadow"
+              >
+                Verify Aadhaar
+              </button>
+            </div>
+          )}
+        </div>
         </div>
 
-        {/* Bio Section */}
-        {!isEditing && (
-          <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-8 mt-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Account Statistics
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-                <p className="text-gray-600 text-sm font-semibold">
-                  Digital Addresses
-                </p>
-                <p className="text-4xl font-bold text-blue-600 mt-2">
-                  {profileData.addresses}
-                </p>
-              </div>
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
-                <p className="text-gray-600 text-sm font-semibold">
-                  Account Status
-                </p>
-                <p className="text-2xl font-bold text-green-600 mt-2">
-                  Verified
-                </p>
-              </div>
-              <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-6 border border-purple-200">
-                <p className="text-gray-600 text-sm font-semibold">
-                  Member Since
-                </p>
-                <p className="text-lg font-bold text-purple-600 mt-2">2024</p>
-              </div>
-            </div>
-          </div>
+       
+
+        {/* Aadhaar Verification Dialog */}
+        {showAadhaarDialog && (
+          <AadhaarVerificationDialog
+            isOpen={showAadhaarDialog}
+            onClose={() => setShowAadhaarDialog(false)}
+            onVerified={() => {
+              setShowAadhaarDialog(false);
+              dispatch(fetchUserDetails());
+            }}
+          />
         )}
 
         {/* Action Buttons */}
@@ -302,13 +337,13 @@ console.log(userVerified);
           <div className="flex gap-4 mt-8 justify-end">
             <button
               onClick={handleCancel}
-              className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border-2 cursor-pointer border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveChanges}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:shadow-lg transition-shadow"
+              className="px-6 py-3 btn1color cursor-pointer font-bold rounded-lg hover:shadow-lg transition-shadow"
             >
               Save Changes
             </button>

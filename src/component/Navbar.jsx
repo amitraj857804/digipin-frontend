@@ -254,7 +254,7 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
               {showLogoutDropdown && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-blue-100 overflow-hidden z-50">
                   {/* Profile Header */}
-                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-5 text-white">
+                  <div className="  btn1color">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold">
                         {username?.charAt(0)?.toUpperCase() || "U"}

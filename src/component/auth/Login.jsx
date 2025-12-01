@@ -100,7 +100,7 @@ function Login({ onSwitchTab, onClose, isModal = false }) {
 
                 <div className="w-full relative">
                   <InputField
-                    requireda
+                    required
                     id="emailOrPhone"
                     type="text"
                     message="*Email or Mobile Number is required"

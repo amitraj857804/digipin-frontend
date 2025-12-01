@@ -1,7 +1,21 @@
 import { X, Copy, MapPin, Shield, Calendar, Phone, Mail, Zap } from "lucide-react";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 function AddressDetailsModal({ isOpen, address, onClose }) {
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   if (!isOpen || !address) return null;
 
   const handleCopy = (text, label) => {
@@ -24,9 +38,14 @@ function AddressDetailsModal({ isOpen, address, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 top-20 pt-12">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <style>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-6 flex items-center justify-between">
+        <div className="sticky top-0 btn1color px-6 py-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-white">Address Details</h2>
           <button
             onClick={onClose}

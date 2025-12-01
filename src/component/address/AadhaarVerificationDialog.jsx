@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Shield, AlertCircle, Loader } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -24,6 +24,19 @@ function AadhaarVerificationDialog({ isOpen, onClose, onVerified }) {
     },
     mode: "onTouched",
   });
+
+  // Prevent background scroll when dialog is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   const handleVerification = async (data) => {
     setLoading(true);
@@ -89,7 +102,12 @@ function AadhaarVerificationDialog({ isOpen, onClose, onVerified }) {
 
   return (
     <div className="fixed inset-0 bg-tra bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white bg-opacity-95 backdrop-blur-md rounded-2xl shadow-2xl max-w-md w-full p-8 max-h-[90vh] overflow-y-auto border top-15 relative border-white border-opacity-20">
+      <div className="bg-white bg-opacity-95 backdrop-blur-md rounded-2xl shadow-2xl max-w-md w-full p-8 max-h-[90vh] overflow-y-auto border top-15 relative border-white border-opacity-20 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <style>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

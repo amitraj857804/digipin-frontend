@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import toast from "react-hot-toast";
 import AddressCard from "../address/AddressCard";
 import AddressDetailsModal from "../address/AddressDetailsModal";
 import { Plus, Search, Filter } from "lucide-react";
+import CreateAddress from "../address/CreateAddress";
 
 function Dashboard() {
   const [addresses, setAddresses] = useState([
@@ -66,6 +67,11 @@ function Dashboard() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("ALL");
+  const createAddressRef = useRef(null);
+
+  const scrollToCreateAddress = () => {
+    createAddressRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Filter addresses
   const filteredAddresses = addresses.filter((address) => {
@@ -165,7 +171,7 @@ function Dashboard() {
           </select>
 
           {/* Create New Button */}
-          <button className="flex items-center justify-center gap-2 btn2color cursor-pointer font-bold rounded-lg hover:shadow-lg transition-shadow">
+          <button onClick={scrollToCreateAddress} className="flex items-center justify-center gap-2 btn2color cursor-pointer font-bold rounded-lg hover:shadow-lg transition-shadow">
             <Plus className="w-5 h-5" /> Create New Address
           </button>
         </div>
@@ -190,6 +196,11 @@ function Dashboard() {
           <p className="text-gray-500 mt-2">Create your first digital address to get started</p>
         </div>
       )}
+
+      {/* Create Address Section */}
+      <div ref={createAddressRef} className="mt-12">
+        <CreateAddress />
+      </div>
 
       {/* Address Details Modal */}
       <AddressDetailsModal

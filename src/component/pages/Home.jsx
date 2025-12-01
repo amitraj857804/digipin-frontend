@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   MapPin,
   Plus,
@@ -15,6 +15,7 @@ import CreateAddress from "../address/CreateAddress";
 function Home() {
   const [digitalAddress] = useState("DIP-9876543210");
   const [copied, setCopied] = useState(false);
+  const createAddressRef = useRef(null);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(digitalAddress);
@@ -23,13 +24,17 @@ function Home() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const scrollToCreateAddress = () => {
+    createAddressRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="mt-16 bg-gradient-to-b from-white via-blue-50 to-indigo-50 min-h-screen">
       {/* Welcome Section */}
       <div className="pt-12 pb-16 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Welcome to Your Digital 
+            Welcome to Your Digital
             <span className="btn2color bg-clip-text text-transparent">
               Address Hub
             </span>
@@ -80,20 +85,7 @@ function Home() {
               </div>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
-                  <p className="text-3xl font-bold text-blue-600">24</p>
-                  <p className="text-sm text-gray-600 mt-1">Deliveries</p>
-                </div>
-                <div className="bg-indigo-50 rounded-lg p-4 text-center border border-indigo-100">
-                  <p className="text-3xl font-bold text-indigo-600">12</p>
-                  <p className="text-sm text-gray-600 mt-1">Shared With</p>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4 text-center border border-purple-100">
-                  <p className="text-3xl font-bold text-purple-600">8</p>
-                  <p className="text-sm text-gray-600 mt-1">Pending</p>
-                </div>
-              </div>
+              
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
@@ -116,7 +108,7 @@ function Home() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase font-semibold">
-                    Account Status
+                    Your Digipin
                   </p>
                   <p className="text-lg font-bold text-gray-900">Premium</p>
                 </div>
@@ -126,34 +118,26 @@ function Home() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg border border-blue-100 p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg">
-                  <Lock className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase font-semibold">
-                    Security
-                  </p>
-                  <p className="text-lg font-bold text-gray-900">Verified</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600">All information secured</p>
-            </div>
+            
 
             <div className="btn2color rounded-xl shadow-lg p-6 text-white">
               <h3 className="font-bold text-lg mb-2">Create New Address</h3>
               <p className="text-blue-100 text-sm mb-4">
                 Generate additional digital addresses for different purposes
               </p>
-              <button className="w-full flex items-center text-indigo-600 justify-center gap-2 px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 font-semibold rounded-lg transition-all">
+              <button
+                className="w-full flex items-center cursor-pointer text-indigo-600 justify-center gap-2 px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 font-semibold rounded-lg transition-all"
+                onClick={scrollToCreateAddress}
+              >
                 <Plus className="w-5 h-5 text-blue-600 " /> Add New
               </button>
             </div>
           </div>
         </div>
 
-        <CreateAddress />
+        <div ref={createAddressRef}>
+          <CreateAddress />
+        </div>
 
         {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
