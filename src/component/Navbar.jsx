@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { MenuIcon, XIcon, MapPin, Shield, Clock, Users, User, Settings, LogOut } from "lucide-react";
+import { MenuIcon, XIcon, MapPin, Shield, Clock, Users, User, Settings, LogOut, Search, MessageSquare, ChevronDown } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -17,7 +17,9 @@ import {
 function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutDropdown, setShowLogoutDropdown] = useState(false);
+  const [showAIUDropdown, setShowAIUDropdown] = useState(false);
   const desktopDropdownRef = useRef(null);
+  const aiuDropdownRef = useRef(null);
   const mobileDropdownRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -53,14 +55,20 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
       const isOutsideMobile =
         mobileDropdownRef.current &&
         !mobileDropdownRef.current.contains(event.target);
+      const isOutsideAIU =
+        aiuDropdownRef.current &&
+        !aiuDropdownRef.current.contains(event.target);
 
       // Only close if it's outside the active dropdown
       if (isOutsideDesktop && isOutsideMobile) {
         setShowLogoutDropdown(false);
       }
+      if (isOutsideAIU) {
+        setShowAIUDropdown(false);
+      }
     };
 
-    if (showLogoutDropdown) {
+    if (showLogoutDropdown || showAIUDropdown) {
       document.addEventListener("click", handleClickOutside);
     } else {
       document.removeEventListener("click", handleClickOutside);
@@ -69,7 +77,7 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [showLogoutDropdown]);
+  }, [showLogoutDropdown, showAIUDropdown]);
 
   // Close mobile menu when clicking anywhere or screen resizes
   useEffect(() => {
@@ -213,6 +221,121 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
           >
             <Clock className="w-4 h-4" /> Contact
           </NavLink>
+
+          {/* AIU Dropdown - Desktop */}
+          <div className="relative hidden lg:block" ref={aiuDropdownRef}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAIUDropdown(!showAIUDropdown);
+              }}
+              className="px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+            >
+              <MapPin className="w-4 h-4" /> AIU Services
+              <ChevronDown className={`w-4 h-4 transition-transform ${showAIUDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showAIUDropdown && (
+              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-blue-100 overflow-hidden z-50">
+                <div className="px-2 py-2 space-y-1">
+                  <Link
+                    to="/user_aiu"
+                    onClick={() => {
+                      setShowAIUDropdown(false);
+                      onCloseAuthModal();
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+                  >
+                    <MapPin className="w-5 h-5" />
+                    <div>
+                      <p className="font-semibold text-sm">Store Address</p>
+                      <p className="text-xs text-gray-500">Add digital address</p>
+                    </div>
+                  </Link>
+                  <Link
+                    to="/resolve_consent"
+                    onClick={() => {
+                      setShowAIUDropdown(false);
+                      onCloseAuthModal();
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+                  >
+                    <Search className="w-5 h-5" />
+                    <div>
+                      <p className="font-semibold text-sm">Resolve Address</p>
+                      <p className="text-xs text-gray-500">Access with consent</p>
+                    </div>
+                  </Link>
+                  <Link
+                    to="/feedback"
+                    onClick={() => {
+                      setShowAIUDropdown(false);
+                      onCloseAuthModal();
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    <div>
+                      <p className="font-semibold text-sm">Submit Feedback</p>
+                      <p className="text-xs text-gray-500">Service feedback</p>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* AIU Mobile Links */}
+          <div className="lg:hidden space-y-1">
+            <NavLink
+              to="/user_aiu"
+              onClick={() => {
+                setIsOpen(false);
+                onCloseAuthModal();
+              }}
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium ${
+                  isActive
+                    ? " btn1color text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                }`
+              }
+            >
+              <MapPin className="w-4 h-4" /> Store Address
+            </NavLink>
+            <NavLink
+              to="/resolve_consent"
+              onClick={() => {
+                setIsOpen(false);
+                onCloseAuthModal();
+              }}
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium ${
+                  isActive
+                    ? " btn1color text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                }`
+              }
+            >
+              <Search className="w-4 h-4" /> Resolve Address
+            </NavLink>
+            <NavLink
+              to="/feedback"
+              onClick={() => {
+                setIsOpen(false);
+                onCloseAuthModal();
+              }}
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium ${
+                  isActive
+                    ? " btn1color text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                }`
+              }
+            >
+              <MessageSquare className="w-4 h-4" /> Submit Feedback
+            </NavLink>
+          </div>
 
           <XIcon
             className="lg:hidden absolute top-4 right-4 w-6 h-6 cursor-pointer text-gray-700"
