@@ -5,10 +5,12 @@ import { BrowserRouter , Routes , Route } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { selectToken } from './store/authSlice'
 import Navbar from './component/Navbar'
-import Home from './component/Home'
-import AuthModal from './component/AuthModal'
+import Home from './component/pages/Home'
+import AuthModal from './component/auth/AuthModal'
 import RootRoute from './component/RootRoute'
 import PrivateRoute from './component/PrivateRoute'
+import Dashboard from './component/pages/Dashborad'
+import UserProfile from './component/UserProfile'
 
 function App() {
   const [authModal, setAuthModal] = useState({
@@ -51,6 +53,22 @@ function App() {
         element={
           <PrivateRoute>
             <Home onOpenLoginModal={openLoginModal} onOpenSignupModal={openSignupModal} />
+          </PrivateRoute>
+        }
+      />
+      <Route 
+        path="/dashboard" 
+        element={
+          <PrivateRoute>
+            <Dashboard onOpenLoginModal={openLoginModal} onOpenSignupModal={openSignupModal} />
+          </PrivateRoute>
+        }
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <PrivateRoute>
+            <UserProfile />
           </PrivateRoute>
         }
       />

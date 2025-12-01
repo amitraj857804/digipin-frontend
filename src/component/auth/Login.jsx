@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import InputField from "./InputField";
+import InputField from "../InputField";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
-import api from "../api/api";
+import api from "../../api/api";
 import { useSelector, useDispatch } from "react-redux";
-import { setToken, selectToken } from "../store/authSlice";
+import { setToken, selectToken } from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";
 
 function Login({ onSwitchTab, onClose, isModal = false }) {

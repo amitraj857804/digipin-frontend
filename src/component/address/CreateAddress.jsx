@@ -1,17 +1,17 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
-import InputField from "./InputField";
+import InputField from "../InputField";
 import { useSelector } from "react-redux";
 import {
   selectUsername,
   selectUserVerified,
   selectToken,
-} from "../store/authSlice";
+} from "../../store/authSlice";
 import AadhaarVerificationDialog from "./AadhaarVerificationDialog";
 import { Plus, Loader } from "lucide-react";
-import api from "../api/api";
-import { createDigitalAddress } from "../utils/geolocation";
+import api from "../../api/api";
+import { createDigitalAddress } from "../../utils/geolocation";
 
 function CreateAddress() {
   const [selectedSuffix, setSelectedSuffix] = useState("home.add");

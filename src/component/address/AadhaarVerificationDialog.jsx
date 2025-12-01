@@ -2,9 +2,9 @@ import { useState } from "react";
 import { X, Shield, AlertCircle, Loader } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import api from "../api/api";
+import api from "../../api/api";
 import { useSelector, useDispatch } from "react-redux";
-import { selectToken, setUserVerified } from "../store/authSlice";
+import { selectToken, setUserVerified } from "../../store/authSlice";
 
 function AadhaarVerificationDialog({ isOpen, onClose, onVerified }) {
   const [loading, setLoading] = useState(false);

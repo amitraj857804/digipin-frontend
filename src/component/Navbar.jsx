@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { MenuIcon, XIcon, MapPin, Shield, Clock, Users } from "lucide-react";
+import { MenuIcon, XIcon, MapPin, Shield, Clock, Users, User, Settings, LogOut } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -8,6 +8,7 @@ import {
   selectUsername,
   selectToken,
   selectUserLoading,
+  selectUserEmail,
   clearToken,
   clearUserName,
   fetchUserDetails,
@@ -21,6 +22,7 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const username = useSelector(selectUsername);
+  const userEmail = useSelector(selectUserEmail);
   const token = useSelector(selectToken);
   const userLoading = useSelector(selectUserLoading);
 
@@ -162,7 +164,7 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
           </NavLink>
 
           <NavLink
-            to="/features"
+            to="/dashboard"
             onClick={() => {
               setIsOpen(false);
               onCloseAuthModal();
@@ -175,7 +177,7 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
               }`
             }
           >
-            <Shield className="w-4 h-4" /> Features
+            <Shield className="w-4 h-4" /> Dashboard
           </NavLink>
 
           <NavLink
@@ -250,13 +252,46 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
               </button>
 
               {showLogoutDropdown && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl border border-blue-100 overflow-hidden z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-blue-100 overflow-hidden z-50">
+                  {/* Profile Header */}
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-5 text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold">
+                        {username?.charAt(0)?.toUpperCase() || "U"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-white truncate">{username}</p>
+                        <p className="text-blue-100 text-xs truncate">{userEmail || "user@example.com"}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="px-2 py-2 space-y-1">
+                    <Link
+                      to="/profile"
+                      onClick={() => setShowLogoutDropdown(false)}
+                      className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+                    >
+                      <User className="w-5 h-5" />
+                      View Profile
+                    </Link>
+                   
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-100"></div>
+
+                  {/* Logout */}
+                  <div className="px-2 py-2">
                   <button
                     onClick={logoutHandler}
-                    className="w-full px-4 py-3 cursor-pointer text-left text-red-600 hover:bg-red-50 font-medium transition-colors"
+                    className="w-full flex cursor-pointer items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 font-semibold  rounded-lg transition-colors"
                   >
+                    <LogOut className="w-5 h-5" />
                     Logout
                   </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -290,11 +325,42 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
               </button>
 
               {showLogoutDropdown && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl border border-blue-100 overflow-hidden z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-blue-100 overflow-hidden z-50">
+                  {/* Profile Header */}
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-5 text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold">
+                        {username?.charAt(0)?.toUpperCase() || "U"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-white truncate">{username}</p>
+                        <p className="text-blue-100 text-xs truncate">{userEmail || "user@example.com"}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="px-2 py-2 space-y-1">
+                    <Link
+                      to="/profile"
+                      onClick={() => setShowLogoutDropdown(false)}
+                      className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+                    >
+                      <User className="w-5 h-5" />
+                      View Profile
+                    </Link>
+                   
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-100"></div>
+
+                  {/* Logout */}
                   <button
                     onClick={logoutHandler}
-                    className="w-full px-4 py-3 cursor-pointer text-left text-red-600 hover:bg-red-50 font-medium transition-colors"
+                    className="w-full flex  cursor-pointer items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 font-semibold transition-colors"
                   >
+                    <LogOut className="w-5 h-5" />
                     Logout
                   </button>
                 </div>

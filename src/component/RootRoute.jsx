@@ -1,8 +1,8 @@
 import { Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { selectToken } from '../store/authSlice'
-import Landing from './Landing'
-import Home from './Home'
+import Landing from './pages/Landing'
+import Home from './pages/Home'
 
 function RootRoute({ onOpenLoginModal, onOpenSignupModal }) {
   const token = useSelector(selectToken)

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import InputField from "./InputField";
-import api from "../api/api";
-import "../App.css";
+import InputField from "../InputField";
+import api from "../../api/api";
+import "../../App.css";
 import { FaUser, FaEye, FaEyeSlash, FaPhoneSquareAlt } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";

@@ -19,7 +19,7 @@ export const fetchUserDetails = createAsyncThunk(
                     "Authorization": `Bearer ${token}`
                 }
             });
-
+            console.log(response.data);
             return response.data;
         } catch (error) {
             if (error.response?.status === 401) {
@@ -43,6 +43,7 @@ const initialState = {
     userLoading: false,
     userError: null,
     userVerified: null,
+    userPhoneNumber: null,
 }
 
 export const tokenSlice = createSlice({
@@ -70,6 +71,7 @@ export const tokenSlice = createSlice({
             state.userEmail = null;
             state.userId = null;
             state.userError = null;
+            state.userPhoneNumber = null;
             localStorage.removeItem("JWT-TOKEN");
         },
     },
@@ -85,10 +87,12 @@ export const tokenSlice = createSlice({
                 state.userLoading = false;
                 // Handle different possible response structures
                 state.userName = action.payload?.username || action.payload?.userName || action.payload?.name || "User";
-                state.userEmail = action.payload?.email || null;
-                state.userVerified = action.payload?.aadhaarVerified || null;
+                state.userEmail = action.payload?.emailId || null;
+                state.userVerified = action.payload?.aadhaarVerified || false;
                 state.userId = action.payload?.id || action.payload?._id || null;
                 state.userError = null;
+                state.userPhoneNumber = action.payload?.phoneNumber || null;
+               
             })
             // Fetch user details - rejected
             .addCase(fetchUserDetails.rejected, (state, action) => {
@@ -103,7 +107,8 @@ export const {
     clearToken,
     setUserName,
     clearUserName,
-    setUserVerified,a
+    setUserVerified,
+
 } = tokenSlice.actions;
 
 // Selectors
@@ -114,5 +119,6 @@ export const selectUserEmail = (state) => state.auth.userEmail;
 export const selectUserId = (state) => state.auth.userId;
 export const selectUserLoading = (state) => state.auth.userLoading;
 export const selectUserError = (state) => state.auth.userError;
+export const selectUserPhone = (state) => state.auth.userPhoneNumber;
 
 export default tokenSlice.reducer;

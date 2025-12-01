@@ -10,7 +10,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import CreateAddress from "./CreateAddress";
+import CreateAddress from "../address/CreateAddress";
 
 function Home() {
   const [digitalAddress] = useState("DIP-9876543210");
