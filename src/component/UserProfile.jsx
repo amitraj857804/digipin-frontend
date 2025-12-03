@@ -34,7 +34,7 @@ function UserProfile() {
   const userError = useSelector(selectUserError);
   const userPhoneNumber = useSelector(selectUserPhone);
   const userVerified = useSelector(selectUserVerified);
-  
+
   // Local state for editable fields
   const [isEditing, setIsEditing] = useState(false);
   const [showAadhaarDialog, setShowAadhaarDialog] = useState(false);
@@ -154,7 +154,7 @@ function UserProfile() {
               </div>
             </div>
 
-            {/* Edit Button */}
+            {/* Edit Button
             {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
@@ -162,7 +162,7 @@ function UserProfile() {
               >
                 <Edit className="w-5 h-5" /> Edit Profile
               </button>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -182,6 +182,7 @@ function UserProfile() {
                 {isEditing ? (
                   <input
                     type="text"
+                   
                     value={editForm.username}
                     onChange={(e) =>
                       handleEditChange("username", e.target.value)
@@ -274,7 +275,7 @@ function UserProfile() {
               </p>
             </div>
             {userVerified ? (
-              <div className="px-6 py-3 bg-green-100 text-green-800 rounded-lg font-semibold flex items-center gap-2">
+              <div className="px-3 py-3 bg-green-100 text-green-800 rounded-full font-semibold flex items-center gap-2">
                 <Shield className="w-5 h-5" /> Verified
               </div>
             ) : (

@@ -49,13 +49,7 @@ export const createDigitalAddress = async (addressData, api, toast, token) => {
   try {
     // Get user's geolocation
     const geolocation = await getGeolocation();
-    console.log(geolocation.latitude);
-    console.log(geolocation.longitude);
-    console.log(addressData.suffix);
-    console.log(addressData.upiPin);
-    console.log(addressData.consentType);
-    console.log(addressData.consentDurationDays);
-    console.log(addressData.address);
+    
     // Prepare the request payload
     const payload = {
       suffix: addressData.suffix || "home.add",

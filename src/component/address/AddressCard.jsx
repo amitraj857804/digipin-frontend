@@ -1,10 +1,50 @@
-import { Copy, Edit, Trash2, Eye } from "lucide-react";
+import { Copy, Edit, Trash2, Eye, Loader, AlertCircle, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { useState } from "react";
+import api from "../../api/api";
+import { useSelector } from "react-redux";
+import { selectToken } from "../../store/authSlice";
 
 function AddressCard({ address, onView, onEdit, onDelete }) {
+  const token = useSelector(selectToken);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard!");
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setShowDeleteDialog(false);
+    setDeleting(true);
+    try {
+      await api.delete(`/api/digital-address/delete?digitalAddress=${address.digitalAddress}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success("Address deleted successfully!");
+      g
+      // Call refresh callback to update dashboard
+      if (onDelete) {
+        onDelete(address.id || address._id);
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to delete address";
+      toast.error(errorMessage);
+      console.error("Delete error:", error);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
   };
 
   const getConsentBadgeColor = (consent) => {
@@ -35,7 +75,7 @@ function AddressCard({ address, onView, onEdit, onDelete }) {
           <p className="text-sm text-gray-600 mt-1">{address.purpose}</p>
         </div>
         <div className="flex gap-2">
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeColor(address.status || 'ACTIVE')}`}>
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeColor(address.hasActiveConsent ? "ACTIVE" : "INACTIVE")}`}>
             {address.status || 'ACTIVE'}
           </span>
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getConsentBadgeColor(address.consentType)}`}>
@@ -67,7 +107,7 @@ function AddressCard({ address, onView, onEdit, onDelete }) {
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Pincode:</span>
-          <span className="font-semibold text-gray-900">{address.pincode}</span>
+          <span className="font-semibold text-gray-900">{address.pinCode}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Created:</span>
@@ -77,10 +117,7 @@ function AddressCard({ address, onView, onEdit, onDelete }) {
         </div>
       </div>
 
-      {/* DaPin Preview */}
-      <div className="bg-blue-50 rounded-lg p-3 mb-4 border border-blue-200">
-        <p className="text-xs text-blue-700 font-semibold">🔐 DaPin: <span className="font-mono">{address.uniPin ? "*".repeat(address.uniPin.length) : "Not set"}</span></p>
-      </div>
+      
 
       {/* Action Buttons */}
       <div className="flex gap-2">
@@ -92,19 +129,70 @@ function AddressCard({ address, onView, onEdit, onDelete }) {
         </button>
         <button
           onClick={() => onEdit(address)}
-          className="p-2 bg-green-100 cursor-pointer text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+          className="p-2 bg-green-100 cursor-pointer text-green-700 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title="Edit address"
+          disabled={deleting}
         >
           <Edit className="w-4 h-4" />
         </button>
         <button
-          onClick={() => onDelete(address.id)}
-          className="p-2 bg-red-100 cursor-pointer text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+          onClick={handleDeleteClick}
+          className="p-2 bg-red-100 cursor-pointer text-red-700 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           title="Delete address"
+          disabled={deleting}
         >
-          <Trash2 className="w-4 h-4" />
+          {deleting ? <Loader className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
         </button>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteDialog && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 border border-blue-100">
+            {/* Icon */}
+            <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mx-auto mb-4">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+            </div>
+
+            {/* Title */}
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+              Delete Address?
+            </h3>
+
+            {/* Message */}
+            <p className="text-gray-600 text-center mb-6">
+              Are you sure you want to delete <strong>{address.addressName}</strong>? This action cannot be undone.
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelDelete}
+                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={deleting}
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {deleting ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

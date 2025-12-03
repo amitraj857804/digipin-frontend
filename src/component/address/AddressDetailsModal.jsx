@@ -114,22 +114,6 @@ function AddressDetailsModal({ isOpen, address, onClose }) {
             </div>
           </div>
 
-          {/* Security Information */}
-          <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-            <div className="flex items-center gap-2 mb-4">
-              <Shield className="w-5 h-5 text-blue-600" />
-              <h4 className="text-lg font-bold text-blue-900">Security Information</h4>
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-700 font-semibold">🔐 DaPin (Digital Address PIN):</span>
-                <span className="font-mono text-lg font-bold text-blue-600">{address.uniPin ? "*".repeat(address.uniPin.length) : "Not set"}</span>
-              </div>
-              <p className="text-sm text-blue-800 bg-white rounded p-3">
-                Your DaPin acts as a consent granter. Partners need this PIN to access your digital address information. Only share this PIN with trusted parties.
-              </p>
-            </div>
-          </div>
 
           {/* Consent Details */}
           <div className="bg-amber-50 rounded-lg p-6 border border-amber-200">

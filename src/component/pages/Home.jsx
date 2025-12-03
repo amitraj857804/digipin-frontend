@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   MapPin,
   Plus,
@@ -11,13 +11,38 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import CreateAddress from "../address/CreateAddress";
+import { useSelector, useDispatch } from "react-redux";
+import { selectToken } from "../../store/authSlice";
+import {
+  selectHighestConfidenceAddress,
+  selectAddressLoading,
+  selectAddressError,
+  fetchAllAddresses,
+} from "../../store/addressSlice";
 
 function Home() {
-  const [digitalAddress] = useState("DIP-9876543210");
+  const dispatch = useDispatch();
   const [copied, setCopied] = useState(false);
   const createAddressRef = useRef(null);
+  const token = useSelector(selectToken);
+  const highestConfidenceAddr = useSelector(selectHighestConfidenceAddress);
+  const loading = useSelector(selectAddressLoading);
+  const error = useSelector(selectAddressError);
+
+  const digitalAddress = highestConfidenceAddr?.digitalAddress || null;
+
+  // Fetch addresses on component mount
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAllAddresses());
+    }
+  }, [token, dispatch]);
 
   const copyToClipboard = () => {
+    if (!digitalAddress) {
+    toast.error("No digital address to copy");~aY8
+      return;
+    }
     navigator.clipboard.writeText(digitalAddress);
     setCopied(true);
     toast.success("Digital address copied!");
@@ -68,23 +93,34 @@ function Home() {
               {/* Address Display */}
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
                 <p className="text-gray-600 text-sm font-semibold uppercase tracking-wide mb-2">
-                  Your Address ID
+                  Your Digital Address ID 
                 </p>
-                <div className="flex items-center justify-between">
-                  <p className="text-4xl font-bold text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text font-mono">
-                    {digitalAddress}
-                  </p>
-                  <button
-                    onClick={copyToClipboard}
-                    className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-blue-50 border border-blue-200 rounded-lg font-semibold text-blue-600 transition-all hover:scale-105"
-                  >
-                    <Copy className="w-5 h-5" />
-                    {copied ? "Copied!" : "Copy"}
-                  </button>
-                </div>
+                 {loading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : error ? (
+                  <div className="text-red-600 text-sm py-4">{error}</div>
+                ) : !digitalAddress ? (
+                  <div className="text-gray-600 text-sm py-4">
+                    No digital address found. Create one to get started!
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <p className="text-4xl font-bold text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text font-mono">
+                      {digitalAddress}
+                    </p>
+                    <button
+                      onClick={copyToClipboard}
+                      className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-white hover:bg-blue-50 border border-blue-500 rounded-lg font-semibold text-blue-600 transition-all hover:scale-105"
+                    >
+                      <Copy className="w-5 h-5" />
+                      {copied ? "Copied!" : "Copy"}
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Quick Stats */}
               
 
               {/* Action Buttons */}

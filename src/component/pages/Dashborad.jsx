@@ -1,67 +1,24 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import AddressCard from "../address/AddressCard";
 import AddressDetailsModal from "../address/AddressDetailsModal";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, Loader } from "lucide-react";
 import CreateAddress from "../address/CreateAddress";
+import { useSelector, useDispatch } from "react-redux";
+import { selectToken } from "../../store/authSlice";
+import {
+  fetchAllAddresses,
+  selectAddresses,
+  selectAddressLoading,
+  selectAddressError,
+} from "../../store/addressSlice";
 
 function Dashboard() {
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      addressName: "My Home",
-      purpose: "Personal - Home Address",
-      address: "123 Main Street, Apartment 4B",
-      pincode: "110001",
-      digitalAddress: "amit_raj@home.add",
-      consentType: "PERMANENT",
-      consentDurationDays: null,
-      uniPin: "123456",
-      latitude: 28.6139,
-      longitude: 77.2090,
-      status: "ACTIVE",
-      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-      updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      sharedWith: 5,
-      deliveryCount: 12,
-    },
-    {
-      id: 2,
-      addressName: "Work Office",
-      purpose: "Business - Office Address",
-      address: "456 Business Plaza, Suite 200",
-      pincode: "110002",
-      digitalAddress: "amit_raj@work.add",
-      consentType: "PERMANENT",
-      consentDurationDays: null,
-      uniPin: "654321",
-      latitude: 28.5244,
-      longitude: 77.1855,
-      status: "ACTIVE",
-      createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-      updatedAt: null,
-      sharedWith: 3,
-      deliveryCount: 8,
-    },
-    {
-      id: 3,
-      addressName: "Temporary Stay",
-      purpose: "Temporary - Temporary Address",
-      address: "789 Temporary Road, Block C",
-      pincode: "110003",
-      digitalAddress: "amit_raj@temp.add",
-      consentType: "TEMPORARY",
-      consentDurationDays: 30,
-      uniPin: "789012",
-      latitude: 28.5355,
-      longitude: 77.3910,
-      status: "ACTIVE",
-      createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-      updatedAt: null,
-      sharedWith: 1,
-      deliveryCount: 2,
-    },
-  ]);
+  const dispatch = useDispatch();
+  const token = useSelector(selectToken);
+  const addresses = useSelector(selectAddresses);
+  const loading = useSelector(selectAddressLoading);
+  const error = useSelector(selectAddressError);
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -69,20 +26,36 @@ function Dashboard() {
   const [filterType, setFilterType] = useState("ALL");
   const createAddressRef = useRef(null);
 
+  // Fetch addresses on component mount
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAllAddresses());
+    }
+  }, [token, dispatch]);
+
+  // Handle refresh (re-fetch addresses)
+  const handleRefresh = () => {
+    if (token) {
+      dispatch(fetchAllAddresses());
+    }
+  };
+
   const scrollToCreateAddress = () => {
     createAddressRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   // Filter addresses
   const filteredAddresses = addresses.filter((address) => {
+    if (!address) return false;
+    
     const matchesSearch =
-      address.addressName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      address.digitalAddress.toLowerCase().includes(searchTerm.toLowerCase());
+      (address.addressName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (address.digitalAddress?.toLowerCase() || "").includes(searchTerm.toLowerCase());
 
     const matchesFilter =
       filterType === "ALL" ||
       address.consentType === filterType ||
-      address.purpose.includes(filterType);
+      (address.purpose?.includes(filterType) || false);
 
     return matchesSearch && matchesFilter;
   });
@@ -101,10 +74,8 @@ function Dashboard() {
 
   // Handle Delete
   const handleDelete = (addressId) => {
-    if (window.confirm("Are you sure you want to delete this address?")) {
-      setAddresses(addresses.filter((addr) => addr.id !== addressId));
-      toast.success("Address deleted successfully!");
-    }
+    // Refresh the address list after deletion
+    handleRefresh();
   };
 
   const stats = {
@@ -177,12 +148,29 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <Loader className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600 font-medium">Loading your digital addresses...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+          <p className="text-red-700 font-medium">{error}</p>
+        </div>
+      )}
+
       {/* Addresses Grid */}
-      {filteredAddresses.length > 0 ? (
+      {!loading && filteredAddresses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAddresses.map((address) => (
             <AddressCard
-              key={address.id}
+              key={address.id || address._id}
               address={address}
               onView={handleViewDetails}
               onEdit={handleEdit}
@@ -190,7 +178,7 @@ function Dashboard() {
             />
           ))}
         </div>
-      ) : (
+      ) : !loading && (
         <div className="text-center py-16">
           <p className="text-gray-600 text-lg">No digital addresses found</p>
           <p className="text-gray-500 mt-2">Create your first digital address to get started</p>
@@ -199,7 +187,7 @@ function Dashboard() {
 
       {/* Create Address Section */}
       <div ref={createAddressRef} className="mt-12">
-        <CreateAddress />
+        <CreateAddress onAddressCreated={handleRefresh} />
       </div>
 
       {/* Address Details Modal */}

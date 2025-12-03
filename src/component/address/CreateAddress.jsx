@@ -2,18 +2,20 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   selectUsername,
   selectUserVerified,
   selectToken,
 } from "../../store/authSlice";
+import { fetchAllAddresses } from "../../store/addressSlice";
 import AadhaarVerificationDialog from "./AadhaarVerificationDialog";
 import { Plus, Loader } from "lucide-react";
 import api from "../../api/api";
 import { createDigitalAddress } from "../../utils/geolocation";
 
-function CreateAddress() {
+function CreateAddress({ onAddressCreated }) {
+  const dispatch = useDispatch();
   const [selectedSuffix, setSelectedSuffix] = useState("home.add");
   const [selectedPurpose, setSelectedPurpose] = useState(
     "Personal - Home Address"
@@ -48,7 +50,6 @@ function CreateAddress() {
 
   const handleCreateClick = (data) => {
     if (!userVerified) {
-      console.log("inside verification");
       // Store form data and show verification dialog
       setPendingFormData(data);
       setShowVerificationDialog(true);
@@ -66,7 +67,6 @@ function CreateAddress() {
       setPendingFormData(null);
     }
   };
-
   const addHandler = async (data) => {
     if (!data) return; // Guard against no data
 
@@ -96,6 +96,14 @@ function CreateAddress() {
       // Show success message with created address
       if (result?.address) {
         toast.success(`Digital address created: ${result.address}`);
+      }
+
+      // Dispatch Redux action to refresh addresses globally
+      dispatch(fetchAllAddresses());
+
+      // Call parent callback if provided
+      if (onAddressCreated) {
+        onAddressCreated();
       }
     } catch (error) {
       console.error("Error creating digital address:", error);
