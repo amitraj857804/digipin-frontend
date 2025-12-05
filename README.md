@@ -1,8 +1,8 @@
-# Digipin - Your Digital Address Solution
+# eSthan - Your Digital Address Solution
 
 ## 🏠 Overview
 
-**Digipin** is a comprehensive digital address platform that simplifies address management, verification, and sharing. Instead of sharing complicated physical addresses, users get a unique digital address identifier (e.g., `user@home.dop`) that can be used for deliveries, directions, and secure sharing with built-in AAVA verification support.
+**eSthan** is a comprehensive digital address platform that simplifies address management, verification, and sharing. Instead of sharing complicated physical addresses, users get a unique digital address identifier (e.g., `user@home.dop`) that can be used for deliveries, directions, and secure sharing with built-in AAVA verification support.
 
 ## ✨ Key Features
 
@@ -96,12 +96,12 @@
 - **Language**: Java (JDK 21)
 - **Framework**: Spring Boot (latest version)
 - **ORM**: Spring Data JPA with Hibernate
-- **Database**: MySQL 8.0+
+- **Primary Database**: MySQL 8.0+
+- **Immutable Ledger Database**: IMMUDB (tamper-proof verification logs & audit trail)
 - **Security**: Spring Security with JWT (JSON Web Token) authentication
 - **API Development**: Spring MVC / Spring REST
 - **Build Tool**: Maven
 - **Dependency Management**: Maven Central Repository
-- **Logging**: SLF4J with Logback
 - **Validation**: Spring Validation & Hibernate Validator
 - **API Documentation**: Swagger/Springdoc OpenAPI
 - **Exception Handling**: Global exception handler with custom error responses
@@ -268,8 +268,8 @@ src/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/amitraj857804/digipin-frontend.git
-cd digipin-frontend
+git clone https://github.com/amitraj857804/esthan-frontend.git
+cd esthan-frontend
 ```
 
 2. Install dependencies:
@@ -318,8 +318,8 @@ npm run dev
 ### Spring Boot Application Structure
 
 ```
-digipin-backend/
-├── src/main/java/com/digipin/
+esthan-backend/
+├── src/main/java/com/esthan/
 │   ├── config/
 │   │   ├── SecurityConfig.java              # Spring Security + JWT configuration
 │   │   ├── JwtConfig.java                   # JWT properties configuration
@@ -427,6 +427,13 @@ digipin-backend/
     <version>8.0.33</version>
 </dependency>
 
+<!-- IMMUDB Client (Immutable Ledger Database) -->
+<dependency>
+    <groupId>io.codenotary</groupId>
+    <artifactId>immudb4j</artifactId>
+    <version>1.4.1</version>
+</dependency>
+
 <!-- Validation -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -472,9 +479,11 @@ digipin-backend/
 </dependency>
 ```
 
-### Database Schema (MySQL)
+### Database Schema
 
-#### Users Table
+#### MySQL Relational Database
+
+**Users Table**
 ```sql
 CREATE TABLE users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -558,6 +567,51 @@ CREATE TABLE aadhaar_verifications (
     INDEX idx_user_id (user_id),
     UNIQUE INDEX idx_user_aadhaar (user_id, aadhaar_number)
 );
+```
+
+#### IMMUDB Immutable Ledger Database
+
+**Purpose**: Store tamper-proof audit logs and verification records
+
+**Key Features**:
+- Cryptographically tamper-proof records
+- Immutable append-only ledger
+- Perfect for AAVA verification audit trail
+- Compliance with audit and regulatory requirements
+- Timestamp verification and non-repudiation
+
+**Stored Records**:
+- AAVA verification attempts and results
+- Address verification timestamps
+- Aadhaar verification confirmations
+- Address flagging reasons and dates
+- User access logs to sensitive data
+- All authentication and authorization events
+- Digital address creation and modification history
+
+**IMMUDB Configuration** (application.properties):
+```properties
+# IMMUDB Configuration
+immudb.server=localhost
+immudb.port=3322
+immudb.database=esthan_ledger
+immudb.username=immudb
+immudb.password=immudb
+```
+
+**Example IMMUDB Storage**:
+```
+Key: AAVA_VERIFICATION_{digitalAddress}_{timestamp}
+Value: {
+  "digitalAddress": "user@home.dop",
+  "agentId": 123,
+  "verificationStatus": "VERIFIED",
+  "timestamp": "2025-12-05T10:30:00Z",
+  "latitude": 28.7041,
+  "longitude": 77.1025,
+  "photoProofUrl": "https://...",
+  "confidenceScore": 0.98
+}
 ```
 
 ### JWT Authentication Flow
@@ -714,7 +768,7 @@ server.port=8080
 server.servlet.context-path=/
 
 # Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/digipin_db
+spring.datasource.url=jdbc:mysql://localhost:3306/esthan_db
 spring.datasource.username=root
 spring.datasource.password=password
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
@@ -738,7 +792,7 @@ cors.allow-credentials=true
 
 # Logging
 logging.level.root=INFO
-logging.level.com.digipin=DEBUG
+logging.level.com.esthan=DEBUG
 
 # Jackson Configuration
 spring.jackson.serialization.write-dates-as-timestamps=false
@@ -760,8 +814,8 @@ mvn spring-boot:run
 Right-click project → Run As → Spring Boot App
 
 # Docker (optional)
-docker build -t digipin-backend .
-docker run -p 8080:8080 digipin-backend
+docker build -t esthan-backend .
+docker run -p 8080:8080 esthan-backend
 
 # Access API Documentation
 http://localhost:8080/swagger-ui.html
@@ -970,7 +1024,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📞 Support
 
-For support, email support@digipin.com or open an issue on GitHub.
+For support, email support@esthan.com or open an issue on GitHub.
 
 ## 🙏 Acknowledgments
 
@@ -983,6 +1037,6 @@ For support, email support@digipin.com or open an issue on GitHub.
 
 ---
 
-**Made with ❤️ by Digipin Team**
+**Made with ❤️ by eSthan Team**
 
-Visit us: [www.digipin.com](https://www.digipin.com)
+Visit us: [www.esthan.com](https://www.esthan.com)
