@@ -18,6 +18,8 @@ import {
   AIU_Resolve,
   AIU_Feedback,
   AAVA_Verification,
+  AAVA_DemoInfo,
+  AAVA_DemoComplete,
 } from "./utils/app";
 
 function App() {
@@ -53,6 +55,7 @@ function App() {
           <Route path="/resolve_consent" element={<AIU_Resolve />} />
           <Route path="/feedback" element={<AIU_Feedback />} />
           <Route path="/verify-aava" element={<AAVA_Verification />} />
+          <Route path="/aava-demo" element={<AAVA_DemoComplete />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route

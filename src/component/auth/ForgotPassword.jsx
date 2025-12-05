@@ -6,7 +6,7 @@ import { FaUser, FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
 import api from "../../api/api";
 
-function ForgotPassword({ onBack }) {
+function ForgotPassword({ onBack, isModal = false }) {
   const [loader, setLoader] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [showPasswords, setShowPasswords] = useState({
@@ -78,8 +78,13 @@ function ForgotPassword({ onBack }) {
 
   if (resetSent) {
     return (
-        
-      <div className="w-full overflow-hidden scrollbar-hide">
+      <div
+        className={`${
+          isModal
+            ? "w-full overflow-hidden scrollbar-hide"
+            : "mt-20 sm:mt-24 mb-10 w-full flex justify-center overflow-hidden scrollbar-hide"
+        }`}
+      >
         <div>
           <div className="py-6 px-6 sm:px-10 rounded-xl scrollbar-hide">
             {/* Success Header */}
@@ -124,11 +129,17 @@ function ForgotPassword({ onBack }) {
   }
 
   return (
-    <div className="w-full overflow-hidden scrollbar-hide ">
+    <div
+      className={`${
+        isModal
+          ? "w-full overflow-hidden scrollbar-hide "
+          : "mt-20 sm:mt-24 mb-10 w-full flex justify-center overflow-hidden scrollbar-hide"
+      }`}
+    >
       <div>
         <form
           onSubmit={handleSubmit(forgotPasswordHandler)}
-          className="py-6 px-6 sm:px-10 rounded-xl scrollbar-hide"
+          className="py-4 px-6 sm:px-10 rounded-xl scrollbar-hide"
         >
           {/* Header */}
           <div className="mb-2">

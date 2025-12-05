@@ -8,12 +8,10 @@ import api from "../../api/api";
 import { useSelector, useDispatch } from "react-redux";
 import { setToken, selectToken } from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";
-import ForgotPassword from "./ForgotPassword";
 
 function Login({ onSwitchTab, onClose, isModal = false }) {
   const [loader, setLoader] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const token = useSelector(selectToken);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -52,11 +50,9 @@ function Login({ onSwitchTab, onClose, isModal = false }) {
   };
 
   const navigateToResetPassword = () => {
-    setShowForgotPassword(true);
-  };
-
-  const handleBackToLogin = () => {
-    setShowForgotPassword(false);
+    if (isModal && onSwitchTab) {
+      onSwitchTab("forgot-password");
+    }
   };
 
   const navigateToSignUp = () => {
@@ -64,11 +60,6 @@ function Login({ onSwitchTab, onClose, isModal = false }) {
       onSwitchTab("signup");
     }
   };
-
-  // Show ForgotPassword component if requested
-  if (showForgotPassword) {
-    return <ForgotPassword onBack={handleBackToLogin} />;
-  }
 
   return (
     <div

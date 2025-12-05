@@ -21,8 +21,12 @@ import {
   Camera,
   Copy,
   Loader,
+  AlertCircle,
+  CheckCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import api from "../api/api";
+import { selectToken } from "../store/authSlice";
 import AadhaarVerificationDialog from "../component/address/AadhaarVerificationDialog";
 
 function UserProfile() {
@@ -34,10 +38,17 @@ function UserProfile() {
   const userError = useSelector(selectUserError);
   const userPhoneNumber = useSelector(selectUserPhone);
   const userVerified = useSelector(selectUserVerified);
+  const token = useSelector(selectToken);
 
   // Local state for editable fields
   const [isEditing, setIsEditing] = useState(false);
   const [showAadhaarDialog, setShowAadhaarDialog] = useState(false);
+  const [aavaModalOpen, setAavaModalOpen] = useState(false);
+  const [aavaFormData, setAavaFormData] = useState({
+    digitalAddress: "",
+    reason: "Address needs physical verification due to mismatch",
+  });
+  const [aavaLoading, setAavaLoading] = useState(false);
   const [profileData, setProfileData] = useState({
     username: username || "User",
     email: userEmail || "email@example.com",
@@ -92,6 +103,48 @@ function UserProfile() {
   const handleCopy = (text, label) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copied to clipboard!`);
+  };
+
+  const handleFlagForAava = async () => {
+    if (!aavaFormData.digitalAddress.trim()) {
+      toast.error("Please enter a digital address");
+      return;
+    }
+
+    setAavaLoading(true);
+    try {
+      const response = await api.post(
+        "/api/digital-address/flag-for-aava",
+        {
+          digitalAddress: aavaFormData.digitalAddress.trim(),
+          reason: aavaFormData.reason.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data) {
+        toast.success("✅ Address flagged for AAVA verification!");
+        setAavaFormData({
+          digitalAddress: "",
+          reason: "Address needs physical verification due to mismatch",
+        });
+        setAavaModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Error flagging address for AAVA:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        "Failed to flag address for AAVA verification";
+      toast.error(errorMessage);
+    } finally {
+      setAavaLoading(false);
+    }
   };
 
   return (
@@ -263,6 +316,117 @@ function UserProfile() {
               </div>
             </div>
           </div>
+
+        {/* Flag for AAVA Verification Section */}
+        <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-8 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Shield className="w-6 h-6 text-purple-600" />
+            <h3 className="text-2xl font-bold text-gray-900">
+              AAVA Verification
+            </h3>
+          </div>
+
+          <p className="text-gray-600 mb-6">
+            Flag your digital address for physical verification by an automated agent. This enhances security and enables access to restricted services.
+          </p>
+
+          <button
+            onClick={() => setAavaModalOpen(true)}
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 cursor-pointer text-white font-bold rounded-lg hover:shadow-lg transition-shadow"
+          >
+            Flag for AAVA Verification
+          </button>
+
+          {/* AAVA Modal */}
+          {aavaModalOpen && (
+            <>
+              <div
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998]"
+                onClick={() => setAavaModalOpen(false)}
+              />
+              <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full pointer-events-auto">
+                  <div className="px-6 py-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      <AlertCircle className="w-6 h-6" />
+                      Flag for AAVA Verification
+                    </h2>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Digital Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={aavaFormData.digitalAddress}
+                        onChange={(e) =>
+                          setAavaFormData({
+                            ...aavaFormData,
+                            digitalAddress: e.target.value,
+                          })
+                        }
+                        placeholder="e.g., user@home.dop"
+                        className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Reason for Verification
+                      </label>
+                      <textarea
+                        value={aavaFormData.reason}
+                        onChange={(e) =>
+                          setAavaFormData({
+                            ...aavaFormData,
+                            reason: e.target.value,
+                          })
+                        }
+                        rows="4"
+                        className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition-all resize-none"
+                      />
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-sm text-blue-800">
+                        <strong>Note:</strong> An AAVA agent will verify the physical location and capture photographic proof. This typically takes 6-8 hours.
+                      </p>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <button
+                        onClick={() => setAavaModalOpen(false)}
+                        className="flex-1 px-4 py-2 border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleFlagForAava}
+                        disabled={aavaLoading}
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-lg hover:shadow-lg transition-shadow disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {aavaLoading ? (
+                          <>
+                            <Loader className="w-4 h-4 animate-spin" />
+                            Flagging...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-4 h-4" />
+                            Flag Address
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
            {/* Aadhaar Verification Card */}
         <div className=" bg-white rounded-2xl shadow-lg border border-blue-100 p-8">
           <div className="flex items-center justify-between mb-6">

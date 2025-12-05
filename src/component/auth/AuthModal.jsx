@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { XIcon } from "lucide-react";
 import Login from "./Login";
 import Signup from "./Signup";
+import ForgotPassword from "./ForgotPassword";
 
 function AuthModal({ isOpen, onClose, initialTab = "login" }) {
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -58,10 +59,15 @@ function AuthModal({ isOpen, onClose, initialTab = "login" }) {
                 onClose={onClose} 
                 isModal={true}
               />
-            ) : (
+            ) : activeTab === "signup" ? (
               <Signup 
                 onSwitchTab={handleSwitchTab} 
                 onClose={onClose} 
+                isModal={true}
+              />
+            ) : (
+              <ForgotPassword 
+                onBack={() => handleSwitchTab("login")} 
                 isModal={true}
               />
             )}

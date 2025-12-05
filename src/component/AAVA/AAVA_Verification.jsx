@@ -119,13 +119,11 @@ function AAVA_Verification() {
 
     try {
       const response = await api.get(
-        `/api/aava/aava-status/${encodeURIComponent(
-          data.digitalAddress.trim()
-        )}`,
+        "/api/aava/aava-status", data,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            
           },
         }
       );
@@ -251,7 +249,8 @@ function AAVA_Verification() {
             </button>
             <button
               onClick={() => setActiveTab("status")}
-              className={`px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-300 flex items-center gap-2 ${
+              className={`px-6 py-3 rounded-xl font-semibold cursor-pointer
+                 transition-all duration-300 flex items-center gap-2 ${
                 activeTab === "status"
                   ? "btn1color shadow-lg"
                   : "text-gray-700 hover:bg-blue-50"
@@ -459,7 +458,7 @@ function AAVA_Verification() {
                       <input
                         type="checkbox"
                         {...register("locationConfirmed")}
-                        className="w-5 h-5 accent-blue-600 rounded"
+                        className="w-5 h-5 accent-blue-600 rounded cursor-pointer"
                       />
                       <span className="text-sm font-medium text-gray-700">
                         I confirm the location is accurate
@@ -486,7 +485,7 @@ function AAVA_Verification() {
                         type="button"
                         onClick={getCurrentLocation}
                         disabled={gettingLocation}
-                        className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 cursor-pointer hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         {gettingLocation ? (
                           <>
@@ -543,7 +542,7 @@ function AAVA_Verification() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full px-8 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-lg rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                    className="w-full px-8 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 cursor-pointer hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-lg rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>

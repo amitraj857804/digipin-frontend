@@ -9,8 +9,10 @@ import {
   Zap,
   TrendingUp,
   Loader,
+  Shield,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import CreateAddress from "../address/CreateAddress";
 import AddressDetailsModal from "../address/AddressDetailsModal";
 import { useSelector, useDispatch } from "react-redux";
@@ -25,6 +27,7 @@ import api from "../../api/api";
 
 function Home() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [digipinId, setDigipinId] = useState(null);
   const [digipinLoading, setDigipinLoading] = useState(false);
@@ -319,6 +322,24 @@ function Home() {
             <p className="text-gray-600 text-sm">
               Protect your privacy with advanced encryption and controls
             </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl shadow-lg border border-indigo-300 p-6 hover:shadow-xl transition-all text-white">
+            <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-lg mb-4">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-lg font-bold mb-2">
+              AAVA Verification
+            </h3>
+            <p className="text-blue-100 text-sm mb-4">
+              Learn how automated agent verification works to validate your digital address
+            </p>
+            <button
+              onClick={() => navigate("/aava-demo")}
+              className="w-full px-4 py-2 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-blue-50 transition-all"
+            >
+              View Demo →
+            </button>
           </div>
         </div>
       </div>

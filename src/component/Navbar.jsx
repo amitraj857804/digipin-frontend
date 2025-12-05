@@ -284,6 +284,20 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
                       <p className="text-xs text-gray-500">Service feedback</p>
                     </div>
                   </Link>
+                  <Link
+                    to="/aava-demo"
+                    onClick={() => {
+                      setShowAIUDropdown(false);
+                      onCloseAuthModal();
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium border-t border-gray-200"
+                  >
+                    <Shield className="w-5 h-5" />
+                    <div>
+                      <p className="font-semibold text-sm">AAVA Verification Demo</p>
+                      <p className="text-xs text-gray-500">How verification works</p>
+                    </div>
+                  </Link>
                 </div>
               </div>
             )}
@@ -338,6 +352,22 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
               }
             >
               <MessageSquare className="w-4 h-4" /> Submit Feedback
+            </NavLink>
+            <NavLink
+              to="/aava-demo"
+              onClick={() => {
+                setIsOpen(false);
+                onCloseAuthModal();
+              }}
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium border-t border-gray-200 pt-3 mt-3 ${
+                  isActive
+                    ? " btn1color text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                }`
+              }
+            >
+              <Shield className="w-4 h-4" /> AAVA Demo
             </NavLink>
           </div>
 
