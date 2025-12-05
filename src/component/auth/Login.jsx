@@ -8,10 +8,12 @@ import api from "../../api/api";
 import { useSelector, useDispatch } from "react-redux";
 import { setToken, selectToken } from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";
+import ForgotPassword from "./ForgotPassword";
 
 function Login({ onSwitchTab, onClose, isModal = false }) {
   const [loader, setLoader] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const token = useSelector(selectToken);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -49,13 +51,25 @@ function Login({ onSwitchTab, onClose, isModal = false }) {
     }
   };
 
-  const navigateToResetPassword = () => {};
+  const navigateToResetPassword = () => {
+    setShowForgotPassword(true);
+  };
+
+  const handleBackToLogin = () => {
+    setShowForgotPassword(false);
+  };
 
   const navigateToSignUp = () => {
     if (isModal && onSwitchTab) {
       onSwitchTab("signup");
     }
   };
+
+  // Show ForgotPassword component if requested
+  if (showForgotPassword) {
+    return <ForgotPassword onBack={handleBackToLogin} />;
+  }
+
   return (
     <div
       className={`${
@@ -177,7 +191,7 @@ function Login({ onSwitchTab, onClose, isModal = false }) {
             <button
               type="button"
               onClick={navigateToResetPassword}
-              className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+              className="text-sm text-blue-600 hover:text-blue-700 cursor-pointer font-semibold transition-colors"
             >
               Forgot Password?
             </button>

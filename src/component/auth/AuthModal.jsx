@@ -11,6 +11,19 @@ function AuthModal({ isOpen, onClose, initialTab = "login" }) {
     setActiveTab(initialTab);
   }, [initialTab, isOpen]);
 
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSwitchTab = (tab) => {
@@ -28,7 +41,7 @@ function AuthModal({ isOpen, onClose, initialTab = "login" }) {
       
       {/* Modal - centered on screen */}
       <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none mt-14 ">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative max-h-[90vh] overflow-y-auto pointer-events-auto">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative max-h-[90vh] overflow-y-auto scrollbar-hide pointer-events-auto">
           {/* Close Button */}
           <button
             onClick={onClose}

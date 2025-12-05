@@ -4,11 +4,13 @@ import { useState } from "react";
 import api from "../../api/api";
 import { useSelector } from "react-redux";
 import { selectToken } from "../../store/authSlice";
+import EditAddressModal from "./EditAddressModal";
 
 function AddressCard({ address, onView, onEdit, onDelete }) {
   const token = useSelector(selectToken);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
@@ -76,7 +78,7 @@ function AddressCard({ address, onView, onEdit, onDelete }) {
         </div>
         <div className="flex gap-2">
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeColor(address.hasActiveConsent ? "ACTIVE" : "INACTIVE")}`}>
-            {address.status || 'ACTIVE'}
+            {address.linkStatus }
           </span>
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getConsentBadgeColor(address.consentType)}`}>
             {address.consentType}
@@ -128,7 +130,7 @@ function AddressCard({ address, onView, onEdit, onDelete }) {
           <Eye className="w-4 h-4" /> View Details
         </button>
         <button
-          onClick={() => onEdit(address)}
+          onClick={() => setShowEditModal(true)}
           className="p-2 bg-green-100 cursor-pointer text-green-700 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title="Edit address"
           disabled={deleting}
@@ -193,6 +195,19 @@ function AddressCard({ address, onView, onEdit, onDelete }) {
           </div>
         </div>
       )}
+
+      {/* Edit Address Modal */}
+      <EditAddressModal
+        address={address}
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onUpdate={(updatedAddress) => {
+          setShowEditModal(false);
+          if (onDelete) {
+            onDelete(address.id || address._id);
+          }
+        }}
+      />
     </div>
   );
 }

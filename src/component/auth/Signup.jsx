@@ -61,7 +61,7 @@ const SignUp = ({
     <div
       className={`${
         isModal
-          ? "w-full overflow-hidden"
+          ? "w-full overflow-hidden scrollbar-hide "
           : "mt-20 sm:mt-24 mb-10 w-full flex justify-center"
       }`}
     >
@@ -70,7 +70,7 @@ const SignUp = ({
           onSubmit={handleSubmit(registerHandler)}
           className={`w-full ${
             isModal
-              ? "py-4 px-6 sm:py-8 sm:px-10 lg:px-14 overflow-hidden"
+              ? "py-4 px-6 sm:py-8 sm:px-10 lg:px-14 overflow-hidden scrollbar-hide"
               : "py-6 px-6 sm:px-10"
           } rounded-xl`}
         >

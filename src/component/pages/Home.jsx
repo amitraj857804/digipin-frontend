@@ -8,9 +8,11 @@ import {
   Lock,
   Zap,
   TrendingUp,
+  Loader,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import CreateAddress from "../address/CreateAddress";
+import AddressDetailsModal from "../address/AddressDetailsModal";
 import { useSelector, useDispatch } from "react-redux";
 import { selectToken } from "../../store/authSlice";
 import {
@@ -19,10 +21,15 @@ import {
   selectAddressError,
   fetchAllAddresses,
 } from "../../store/addressSlice";
+import api from "../../api/api";
 
 function Home() {
   const dispatch = useDispatch();
   const [copied, setCopied] = useState(false);
+  const [digipinId, setDigipinId] = useState(null);
+  const [digipinLoading, setDigipinLoading] = useState(false);
+  const [digipinError, setDigipinError] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const createAddressRef = useRef(null);
   const token = useSelector(selectToken);
   const highestConfidenceAddr = useSelector(selectHighestConfidenceAddress);
@@ -38,9 +45,55 @@ function Home() {
     }
   }, [token, dispatch]);
 
+  // Fetch Digipin ID based on device location
+  useEffect(() => {
+    if (token) {
+      fetchDigipinIdFromDeviceLocation();
+    }
+  }, [token]);
+
+  const fetchDigipinIdFromDeviceLocation = async () => {
+    if (!navigator.geolocation) {
+      setDigipinError("Geolocation not available");
+      return;
+    }
+
+    setDigipinLoading(true);
+    setDigipinError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          
+          const response = await api.get(
+            `/api/digital-address/digipin?lon=${longitude}&lat=${latitude}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setDigipinId(response.data.digipinId || response.data);
+        } catch (err) {
+          console.error("Error fetching Digipin ID:", err);
+          setDigipinError("Failed to load");
+        } finally {
+          setDigipinLoading(false);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        setDigipinError("Location access denied");
+        setDigipinLoading(false);
+      }
+    );
+  };
+
   const copyToClipboard = () => {
     if (!digitalAddress) {
-    toast.error("No digital address to copy");~aY8
+      toast.error("No digital address to copy");
       return;
     }
     navigator.clipboard.writeText(digitalAddress);
@@ -71,23 +124,31 @@ function Home() {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
           {/* Digital Address Card */}
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-blue-100 p-8">
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-blue-100 p-6 sm:p-8">
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <MapPin className="w-6 h-6 text-blue-600" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <MapPin className="w-5 sm:w-6 h-5 sm:h-6 text-blue-600" />
                     Your Digital Address
                   </h2>
-                  <p className="text-gray-600 mt-1">
+                  <p className="text-gray-600 text-sm sm:text-base mt-1">
                     Your unique identifier for receiving deliveries
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-semibold">
-                  <Eye className="w-4 h-4" /> Active
-                </div>
+                {highestConfidenceAddr && (
+                  <div className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-semibold text-sm sm:text-base whitespace-nowrap ${
+                    highestConfidenceAddr.status === "ACTIVE" 
+                      ? "bg-green-100 text-green-700" 
+                      : highestConfidenceAddr.status === "EXPIRED"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-blue-100 text-blue-700"
+                  }`}>
+                    <Eye className="w-4 h-4" /> {highestConfidenceAddr.linkStatus }
+                  </div>
+                )}
               </div>
 
               {/* Address Display */}
@@ -106,16 +167,16 @@ function Home() {
                     No digital address found. Create one to get started!
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between">
-                    <p className="text-4xl font-bold text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text font-mono">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <p className="text-2xl sm:text-4xl font-bold text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text font-mono break-all">
                       {digitalAddress}
                     </p>
                     <button
                       onClick={copyToClipboard}
-                      className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-white hover:bg-blue-50 border border-blue-500 rounded-lg font-semibold text-blue-600 transition-all hover:scale-105"
+                      className="flex items-center cursor-pointer gap-2 px-3 sm:px-4 py-2 bg-white hover:bg-blue-50 border border-blue-500 rounded-lg font-semibold text-blue-600 transition-all hover:scale-105 whitespace-nowrap text-sm sm:text-base"
                     >
-                      <Copy className="w-5 h-5" />
-                      {copied ? "Copied!" : "Copy"}
+                      <Copy className="w-4 sm:w-5 h-4 sm:h-5" />
+                      <span className="hidden sm:inline">{copied ? "Copied!" : "Copy"}</span>
                     </button>
                   </div>
                 )}
@@ -125,11 +186,45 @@ function Home() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 btn1color font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all">
-                  <Share2 className="w-5 h-5" /> Share Address
+                <button 
+                  onClick={async () => {
+                    if (!digitalAddress) {
+                      toast.error("No address to share");
+                      return;
+                    }
+
+                    // Check if Web Share API is available
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({
+                          title: "My Digital Address",
+                          text: `My digital address is: ${digitalAddress}`,
+                        });
+                        toast.success("Address shared successfully!");
+                      } catch (err) {
+                        if (err.name !== "AbortError") {
+                          toast.error("Failed to share");
+                        }
+                      }
+                    } else {
+                      // Fallback: Copy to clipboard if Web Share API is not available
+                      try {
+                        await navigator.clipboard.writeText(digitalAddress);
+                        toast.success("Address copied! Share via your preferred method");
+                      } catch (err) {
+                        toast.error("Failed to copy address");
+                      }
+                    }
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 btn1color font-semibold text-sm sm:text-base rounded-lg hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
+                >
+                  <Share2 className="w-4 sm:w-5 h-4 sm:h-5" /> Share Address
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-all">
-                  <Eye className="w-5 h-5" /> View Details
+                <button 
+                  onClick={() => setShowDetailsModal(true)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-3 border-2 border-blue-600 text-blue-600 font-semibold text-sm sm:text-base rounded-lg hover:bg-blue-50 transition-all cursor-pointer"
+                >
+                  <Eye className="w-4 sm:w-5 h-4 sm:h-5" /> View Details
                 </button>
               </div>
             </div>
@@ -144,13 +239,26 @@ function Home() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase font-semibold">
-                    Your Digipin
+                    Your Digipin ID
                   </p>
-                  <p className="text-lg font-bold text-gray-900">Premium</p>
+                  {digipinLoading ? (
+                    <div className="flex items-center gap-1">
+                      <Loader className="w-4 h-4 animate-spin text-gray-600" />
+                      <p className="text-xs text-gray-600">Loading...</p>
+                    </div>
+                  ) : digipinError ? (
+                    <p className="text-sm text-red-600 font-semibold">{digipinError}</p>
+                  ) : digipinId ? (
+                    <p className="text-xl font-bold text-gray-900 truncate">
+                      {digipinId}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-gray-600">Not available</p>
+                  )}
                 </div>
               </div>
               <p className="text-sm text-gray-600">
-                Full access to all features
+                Unique identifier for your digital address
               </p>
             </div>
 
@@ -214,6 +322,13 @@ function Home() {
           </div>
         </div>
       </div>
+      
+      {/* Address Details Modal */}
+      <AddressDetailsModal 
+        isOpen={showDetailsModal}
+        address={highestConfidenceAddr}
+        onClose={() => setShowDetailsModal(false)}
+      />
     </div>
   );
 }

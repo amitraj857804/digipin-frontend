@@ -17,9 +17,7 @@ import { createDigitalAddress } from "../../utils/geolocation";
 function CreateAddress({ onAddressCreated }) {
   const dispatch = useDispatch();
   const [selectedSuffix, setSelectedSuffix] = useState("home.add");
-  const [selectedPurpose, setSelectedPurpose] = useState(
-    "Personal - Home Address"
-  );
+  
   const [showCustomSuffix, setShowCustomSuffix] = useState(false);
   const [customSuffix, setCustomSuffix] = useState("");
   const [showVerificationDialog, setShowVerificationDialog] = useState(false);
@@ -39,7 +37,7 @@ function CreateAddress({ onAddressCreated }) {
       addressName: "",
       address: "",
       pincode: "",
-      upiPin: "",
+      uniPin: "",
       consentType: "PERMANENT",
       consentDurationDays: 365,
     },
@@ -169,7 +167,7 @@ function CreateAddress({ onAddressCreated }) {
               <div className="flex gap-3">
                 <div className="w-1/2">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Address
+                    Physical Address
                   </label>
                   <InputField
                     required={true}
@@ -331,15 +329,7 @@ function CreateAddress({ onAddressCreated }) {
                   </div>
                 )}
 
-                {/* Preview of complete address */}
-                <div className="mt-3 px-4 py-1 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-xs text-gray-600 font-semibold uppercase">
-                    Complete Address
-                  </p>
-                  <p className="text-lg font-bold text-blue-600">
-                    {username}@{selectedSuffix}
-                  </p>
-                </div>
+              
               </div>
               <button
                 type="submit"
@@ -358,32 +348,47 @@ function CreateAddress({ onAddressCreated }) {
               </button>
             </div>
           </form>
-          <div className="gap-8 flex flex-col">
+          <div className="gap-4 flex flex-col">
             {/* Preview Section */}
-            <div className="flex flex-col justify-center">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+            <div className="flex flex-col justify-center sm:-mt-12">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 ">
                 <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
-                  Preview
+                  📸 Live Preview
                 </p>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-gray-500">Purpose</p>
+                    <p className="text-xs text-gray-500 uppercase font-semibold">Purpose</p>
                     <p className="text-lg font-bold text-gray-900">
-                      Personal - Home Address
+                      {formValues.purpose || "Select a purpose"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Address Name</p>
-                    <p className="text-lg font-bold text-gray-900">My Home</p>
+                    <p className="text-xs text-gray-500 uppercase font-semibold">Address Name</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {formValues.addressName || "Enter address name"}
+                    </p>
                   </div>
                   <div className="pt-4 border-t border-blue-200">
-                    <p className="text-xs text-gray-500 mb-2">
-                      Your Generated ID
-                    </p>
-                    <p className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text font-mono">
-                      DIP-XXXXXXXXXX
+                    <p className="text-xs text-gray-500 mb-2 uppercase font-semibold">Your Digital Address</p>
+                    <p className="text-lg font-bold text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text font-mono break-all">
+                      {username}@{selectedSuffix}
                     </p>
                   </div>
+                  <div className="pt-4 border-t border-blue-200">
+                    <p className="text-xs text-gray-500 mb-2 uppercase font-semibold">Consent Configuration</p>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        formValues.consentType === "PERMANENT" 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-amber-100 text-amber-800"
+                      }`}>
+                        {formValues.consentType === "TEMPORARY" 
+                          ? `Temporary (${formValues.consentDurationDays || 0} days)` 
+                          : "Permanent"}
+                      </span>
+                    </div>
+                  </div>
+                 
                 </div>
               </div>
             </div>

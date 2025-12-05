@@ -104,9 +104,7 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
     };
   }, [isOpen]);
 
-  const loginHandler = () => {
-    navigate("/login");
-  };
+  
 
   const logoutHandler = () => {
     dispatch(clearToken());
@@ -154,39 +152,45 @@ function Navbar({ onOpenLoginModal, onOpenSignupModal, onCloseAuthModal }) {
             transition-all duration-300 z-40`}
           onClick={(e) => e.stopPropagation()}
         >
-          <NavLink
-            to="/home"
-            onClick={() => {
-              setIsOpen(false);
-              onCloseAuthModal();
-            }}
-            className={({ isActive }) =>
-              `px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium ${
-                isActive
-                  ? " btn1color text-white shadow-md"
-                  : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-              }`
-            }
-          >
-            <span className="hidden lg:inline">🏠</span> Home
-          </NavLink>
+          {/* Home - Only visible when logged in */}
+          {token && (
+            <NavLink
+              to="/home"
+              onClick={() => {
+                setIsOpen(false);
+                onCloseAuthModal();
+              }}
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium ${
+                  isActive
+                    ? " btn1color text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                }`
+              }
+            >
+              <span className="hidden lg:inline">🏠</span> Home
+            </NavLink>
+          )}
 
-          <NavLink
-            to="/dashboard"
-            onClick={() => {
-              setIsOpen(false);
-              onCloseAuthModal();
-            }}
-            className={({ isActive }) =>
-              `px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium ${
-                isActive
-                  ? " btn1color  text-white shadow-md"
-                  : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-              }`
-            }
-          >
-            <Shield className="w-4 h-4" /> Dashboard
-          </NavLink>
+          {/* Dashboard - Only visible when logged in */}
+          {token && (
+            <NavLink
+              to="/dashboard"
+              onClick={() => {
+                setIsOpen(false);
+                onCloseAuthModal();
+              }}
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg transition-all flex items-center gap-2 font-medium ${
+                  isActive
+                    ? " btn1color  text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                }`
+              }
+            >
+              <Shield className="w-4 h-4" /> Dashboard
+            </NavLink>
+          )}
 
           <NavLink
             to="/about"
